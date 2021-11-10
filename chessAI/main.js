@@ -551,7 +551,7 @@ class Browser {
                 let fen = fenRegex.exec(result);
                 let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                 fenString = fenString.replace('w -', 'w KQkq');
-                fenString = fenString.replace(`${this.notEat} ${this.moves}`, `${this.notEat} ${this.moves}`);
+                fenString = fenString.replace(`0 1`, `${this.notEat} ${this.moves}`);
                 let accuracy = accuracyRegex.exec(result);
                 
                 console.log(`FEN: ${fenString}`);

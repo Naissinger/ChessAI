@@ -1,0 +1,27 @@
+{
+  "name": "chessai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "child_process": "^1.0.2",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "pil": "^0.1.1",
+    "python-shell": "^3.0.1",
+    "request": "^2.88.2",
+    "requests": "^0.3.0",
+    "selenium-webdriver": "^4.0.0",
+    "sync-request": "^6.1.0",
+    "util": "^0.12.4"
+  },
+  "devDependencies": {
+    "stockfish": "^12.0.0"
+  }
+}

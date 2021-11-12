@@ -15,7 +15,7 @@ class Browser {
         this.login;
         this.turn = false;
         this.hintsOn = false;
-        this.notEat = 0;
+        this.notEatandMove = 0;
         this.moves = 1;
         this.playMove;
         this.password;
@@ -43,8 +43,8 @@ class Browser {
         
         try {
             
-            this.login = 'GMNaissinger';
-            this.password = '35i:ussuc&Lq)Uq';
+            this.login = 'StockAI';
+            this.password = '8zC5R6*Q@=krbY;';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -56,7 +56,7 @@ class Browser {
 
         }
     }
-
+    
     async relacaoEntrePecas(peca) {
         
         switch(peca) {
@@ -155,7 +155,6 @@ class Browser {
         
         await this.clearBoard();
         
-        console.log(boardArray);
         for(let i = 0; i < boardArray.length; i++) {
             
             if(boardArray[i] != '') {
@@ -217,21 +216,16 @@ class Browser {
         const chrome = require("selenium-webdriver/chrome");
         const chromeOptions = new chrome.Options();
 
-        chromeOptions.addArguments("test-type");
-        chromeOptions.addArguments("--js-flags=--expose-gc");
-        chromeOptions.addArguments("--enable-precise-memory-info");
-        chromeOptions.addArguments("--disable-popup-blocking");
-        chromeOptions.addArguments("--disable-default-apps");
-        chromeOptions.addArguments("--disable-infobars");
-        chromeOptions.addArguments(['user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.11 Safari/537.36"']);
+        chromeOptions.addArguments("ignore-certificate-errors");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
 
-        this.driver = new Builder().forBrowser('chrome').setChromeOptions().build();
+        this.driver = new Builder().withCapabilities(chromeOptions).build();
     }
 
     async makeLogin() {
 
         if(await this.getLogin()) {
-            while(true) {
                 try {
 
                     await this.driver.get('https://www.chess.com/')
@@ -241,17 +235,19 @@ class Browser {
                     await this.driver.findElement(By.id('password')).sendKeys(this.password);
                     await this.driver.findElement(By.id('login')).click();
 
-                    await this.driver.sleep(10000);
+                    while(true) {
+                        try {
+                            await this.driver.findElement(By.className('home-username'))
+                            console.log('Login efetuado com sucesso.');
+                            return true;
+                        } catch(error) {
 
-                    if(await this.driver.findElement(By.className('home-username'))) {
-                        console.log('Login efetuado com sucesso.');
-                        return true;
+                        }
                     }
 
                 } catch(NoSuchElementError) {
-                    continue;
+                    
                 }
-            }
         }
     }
 
@@ -261,6 +257,8 @@ class Browser {
 
             await this.driver.get('https://www.chess.com/play/online');
             await this.driver.sleep(1000);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
 
         } finally {
@@ -278,13 +276,13 @@ class Browser {
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/a[1]')).click();
             await this.driver.sleep(2000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('/html/body/div[3]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
             await this.driver.findElement(By.xpath('/html/body/div[22]/div/div/div[1]/div/label[4]')).click();
             await this.driver.findElement(By.id('guest-button')).click();
             await this.driver.sleep(2000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('/html/body/div[3]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
 
             await this.driver.wait(until.elementIsVisible(By.className('user-tagline-rating user-tagline-dark')));
@@ -340,6 +338,7 @@ class Browser {
         await this.personalizeBoard(8, 4);
 
         while(true) {
+            await this.restart();
             await this.getPlayerTurn();
             await this.getBoardState();
             await this.boardToFen();
@@ -396,8 +395,13 @@ class Browser {
     async piece(pos) {
         
         var index = await this.relacaoEntreCasas(pos);
-        console.log(index);
-        console.log(this.board[index]);
+
+        if(this.board[index] == "P") {
+            this.notEatandMove = 0;
+        } else {
+            this.notEatandMove++;
+        }
+
         return await this.relacaoPecas(this.board[index]);
     }
 
@@ -409,8 +413,6 @@ class Browser {
             var piecePos = square + splitMove[1];
             var piecePos = parseInt(piecePos);
             var piece = await this.piece(piecePos);
-            console.log(piece);
-            console.log(piecePos);
             await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
 
             var squareHint = await this.numberConvert(splitMove[2]);
@@ -420,55 +422,44 @@ class Browser {
             try {
                 var element = await this.driver.findElement(By.className(`hint square-${piecePosHint}`));
             } catch(error) {
-                var element = await this.driver.findElement(By.className(`capture-hint square-${piecePosHint}`));
-                this.notEat = 0;
+                try {
+                    var element = await this.driver.findElement(By.className(`capture-hint square-${piecePosHint}`));
+                    this.notEatandMove = 0;
+                }catch(error) {
+
+                }
             }
             
             await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
+            
+            await this.driver.sleep(1000);
 
-            this.moves++;
-            this.hintsOn = true;
-            this.notEat++;
-        } catch(NoSuchElementError) {
-            if(this.hintsOn == false) {
-                await this.turnHintsOn();
+            if(await this.getPlayerTurn()) {
+                console.log('\nSeu Turno!');
+                this.moves++;
+                this.hintsOn = true;
             }
-            if(piece != undefined) {
-                await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
-                await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
+        } catch(error) {
+            try {
+                if(this.hintsOn == false) {
+                    await this.turnHintsOn();
+                }
+            } catch(error) {
+                console.log(error);
             }
         }
-        // if(this.player == "White") {
-        //     await this.driver.findElement(By.className('piece wp square-52')).click();
+    }
+
+    async restart() {
+
+        try {
+            if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
+                await this.driver.findElement(By.xpath('ui_v5-button-component ui_v5-button-primary')).click();
+                this.moves = 0;
+            }
+        } catch(error) {
             
-        //     try {
-        //         const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
-
-        //         var element = await this.driver.findElement(By.className(`hint square-54`));
-
-        //         this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-
-        //     } catch(NoSuchElementError) { 
-        //         await this.turnHintsOn();
-        //         await this.driver.sleep(1000);
-        //         this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-        //     }
-        // } else if(this.player == "Black") {
-        //     await this.driver.findElement(By.className('piece bp square-47')).click();
-            
-        //     try {
-        //         const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
-
-        //         var element = await this.driver.findElement(By.className(`hint square-45`));
-
-        //         this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-                
-        //     } catch(NoSuchElementError) {
-        //         await this.turnHintsOn();
-        //         await this.driver.sleep(1000);
-        //         this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-        //     }   
-        // }
+        }
     }
 
     async main() {
@@ -482,12 +473,12 @@ class Browser {
             await this.inicia();
             // if(await this.makeLogin()) {
             //     await this.startMatch();
-            //     await this.getBoardState();
+            //     await this.inicia();
             // } else {
             //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
             // }
             
-        } finally {
+        } catch(error) {
 
         }
     }
@@ -505,10 +496,10 @@ class Browser {
 
             while(true) {
                 try{
-                    if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-player-turn player-clock'))) {
+                    if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
                         
                         this.turn = true;
-                        return;
+                        return true;
                     }
                 } catch(NoSuchElementError) {
                     continue;
@@ -521,7 +512,7 @@ class Browser {
                     if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
                         
                         this.turn = true;
-                        return;
+                        return true;
                     }
                 } catch(NoSuchElementError) {
                     continue;
@@ -539,36 +530,35 @@ class Browser {
 
     async boardToFen() {
         
-        try {
-            if(this.turn) {
+        while(true) {
+            try {
+                if(this.turn) {
 
-                await this.screenShot();
+                    await this.screenShot();
 
-                const fenRegex = /FEN:([\w\W]{0,})F/gm;
-                const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
+                    const fenRegex = /FEN:([\w\W]{0,})F/gm;
+                    const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
 
-                let result = require('child_process').execSync("python tensorflow_chessbot.py --filepath board.png").toString();
-                let fen = fenRegex.exec(result);
-                let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                fenString = fenString.replace('w -', 'w KQkq');
-                fenString = fenString.replace(`0 1`, `${this.notEat} ${this.moves}`);
-                let accuracy = accuracyRegex.exec(result);
-                
-                console.log(`FEN: ${fenString}`);
-                console.log(accuracy[1]);
+                    let result = require('child_process').execSync("python tensorflow_chessbot.py --filepath board.png").toString();
+                    let fen = fenRegex.exec(result);
+                    let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                    fenString = fenString.replace('0 1', `0 ${this.moves}`);
+                    let accuracy = accuracyRegex.exec(result);
+                    
+                    console.log(`FEN: ${fenString}`);
+                    console.log(accuracy[1]);
 
-                let object = await this.calculateMove(fenString);
-                object = await object.body.toString();
-                object = await JSON.parse(object);
-                console.log(object);
-                let bestMove = object.pvs[0].moves.split(" ");
-                bestMove = bestMove[0];
+                    let object = await this.calculateMove(fenString);
+                    let bestMove = object.body.toString();
+                    console.log(`BestMove: ${bestMove}`)
+                    this.playMove = bestMove;
 
-                console.log(`BestMove: ${bestMove}`)
-                this.playMove = bestMove;
+                    if(bestMove)
+                        break;
+                }
+            } catch(error) {
+                console.log(error)
             }
-        } catch(error) {
-            
         }
     }
 
@@ -576,7 +566,12 @@ class Browser {
         
         try {
             
-            let response = await request('GET', `https://lichess.org/api/cloud-eval?fen=${fen}`);
+            let response = await request('POST', `https://chess.apurn.com/nextmove`, {
+                body: `${fen}`,
+                headers: {
+                    'Content-Type': 'text/plain'
+                  }
+            });
 
             return response;
         } catch(error) {

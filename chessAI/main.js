@@ -549,11 +549,11 @@ class Browser {
                     console.log(accuracy[1]);
 
                     let object = await this.calculateMove(fenString);
-                    let bestMove = object.body.toString();
-                    console.log(`BestMove: ${bestMove}`)
-                    this.playMove = bestMove;
+                    // let bestMove = object.body.toString();
+                    console.log(`BestMove: ${object}`)
+                    this.playMove = object;
 
-                    if(bestMove)
+                    if(this.playMove)
                         break;
                 }
             } catch(error) {
@@ -565,6 +565,18 @@ class Browser {
     async calculateMove(fen) {
         
         try {
+            
+            const regex = /Best Move: ([\w\W]{4})/gm;
+            const board = /([\w\W]{0,}\+)/gm;
+            let result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
+            let move = regex.exec(result)
+            let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            let b = board.exec(result)
+            let bor = b[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
+            // console.log(`Board View:\n\n${bor}`)
+
+            return bestMove
             
             let response = await request('POST', `https://chess.apurn.com/nextmove`, {
                 body: `${fen}`,

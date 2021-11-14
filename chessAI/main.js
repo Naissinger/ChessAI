@@ -21,6 +21,7 @@ class Browser {
         this.password;
         this.player;
         this.oponent;
+        this.roque = true;
         this.board = [
             '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '',
@@ -391,6 +392,9 @@ class Browser {
         
         var index = await this.relacaoEntreCasas(pos);
 
+        if(this.board[index] == "K" || this.board[index] == "k" || this.board[index] == "R" || this.board[index] == "r") {
+            this.roque = false;
+        }
         return await this.relacaoPecas(this.board[index]);
     }
 
@@ -484,7 +488,9 @@ class Browser {
         try {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
+                await this.driver.sleep(2000);
                 this.moves = 0;
+                this.roque = true;
             }
         } catch(error) {
             
@@ -621,8 +627,16 @@ class Browser {
                     let fen = fenRegex.exec(result);
                     let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                     fenString = fenString.replace('0 1', `0 ${this.moves}`);
-                    if(this.player == "Black")
+                    
+                    if(this.roque) {
+                        fenString = fenString.replace('w -', 'w KQkq');
+                    }
+                    if(this.player == "Black") {
                         fenString = fenString.replace('w', 'b');
+                        if(this.roque){
+                            fenString = fenString.replace('b -', 'b KQkq');
+                        }
+                    }
                     let accuracy = accuracyRegex.exec(result);
                     
                     console.log('\n----------------------------------------------------')

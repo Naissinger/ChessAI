@@ -43,8 +43,8 @@ class Browser {
         
         try {
             
-            this.login = 'StockAI';
-            this.password = '8zC5R6*Q@=krbY;';
+            this.login = 'EloRush';
+            this.password = 'b6?d7N4NZ-QkJi&';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -190,6 +190,7 @@ class Browser {
                 count = 0;
             }
         }
+        console.log('--------------')
         console.log(`\nBoard View:`);
         console.log(`\n${boardView}\n`);
     }
@@ -316,15 +317,9 @@ class Browser {
         
         while(true) {
             try {
-                if(await this.driver.findElement(By.className('clock-component clock-black clock-top clock-live clock-running player-clock'))) {
-                    let image = await board.takeScreenshot();
-                    await writeFile('board.png', image, 'base64');
-                    break;
-                } else if (await this.driver.findElement(By.className('clock-component clock-white clock-top clock-live clock-running player-clock'))) {
-                    let image = await board.takeScreenshot();
-                    await writeFile('board.png', image, 'base64');
-                    break;
-                }
+                let image = await board.takeScreenshot();
+                await writeFile('board.png', image, 'base64');
+                break;
             } catch(error) {
                 continue;
             }
@@ -333,12 +328,12 @@ class Browser {
 
     async inicia() {
         
-        await this.getPlayerColor();
-        await this.turnHintsOn();
-        await this.personalizeBoard(8, 4);
+        // await this.turnHintsOn();
+        // await this.personalizeBoard(8, 4);
 
         while(true) {
             await this.restart();
+            await this.getPlayerColor();
             await this.getPlayerTurn();
             await this.getBoardState();
             await this.boardToFen();
@@ -396,28 +391,62 @@ class Browser {
         
         var index = await this.relacaoEntreCasas(pos);
 
-        if(this.board[index] == "P") {
-            this.notEatandMove = 0;
-        } else {
-            this.notEatandMove++;
-        }
-
         return await this.relacaoPecas(this.board[index]);
+    }
+
+    async negras(number) {
+
+        switch(number) {
+            case "1":
+                return '8';
+            case "2":
+                return '7';
+            case "3":
+                return '6';
+            case "4":
+                return '5';
+            case "5":
+                return '4';
+            case "6":
+                return '3';
+            case "7":
+                return '2';
+            case "8":
+                return '1';
+        }
     }
 
     async move() {
         
-        try {
-            var splitMove = this.playMove.split('');
-            var square = await this.numberConvert(splitMove[0]);
-            var piecePos = square + splitMove[1];
-            var piecePos = parseInt(piecePos);
-            var piece = await this.piece(piecePos);
-            await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
+        await this.restart();
 
-            var squareHint = await this.numberConvert(splitMove[2]);
-            var piecePosHint = squareHint + splitMove[3];
-            var piecePosHint = parseInt(piecePosHint);
+        try {
+            if(this.player == "White") {
+                var splitMove = this.playMove.split('');
+                var square = await this.numberConvert(splitMove[0]);
+                var piecePos = square + splitMove[1];
+                var piecePos = parseInt(piecePos);
+                var piece = await this.piece(piecePos);
+                await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
+
+                var squareHint = await this.numberConvert(splitMove[2]);
+                var piecePosHint = squareHint + splitMove[3];
+                var piecePosHint = parseInt(piecePosHint);
+
+            } else if(this.player == "Black") {
+                var splitMove = this.playMove.split('');
+                var square = await this.numberConvert(splitMove[0]);
+                var piecePos = square + splitMove[1];
+                var piecePos = parseInt(piecePos);
+                var piece = await this.piece(piecePos);
+
+                await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
+
+                var squareHint = await this.numberConvert(splitMove[2]);
+                var piecePosHint = squareHint + splitMove[3];
+                var piecePosHint = parseInt(piecePosHint);
+
+            }
 
             try {
                 var element = await this.driver.findElement(By.className(`hint square-${piecePosHint}`));
@@ -453,8 +482,8 @@ class Browser {
     async restart() {
 
         try {
-            if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
-                await this.driver.findElement(By.xpath('ui_v5-button-component ui_v5-button-primary')).click();
+            if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
+                await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
                 this.moves = 0;
             }
         } catch(error) {
@@ -469,14 +498,14 @@ class Browser {
 
             await this.driver.manage().window().maximize();
             
-            await this.noLogin();
-            await this.inicia();
-            // if(await this.makeLogin()) {
-            //     await this.startMatch();
-            //     await this.inicia();
-            // } else {
-            //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
-            // }
+            // await this.noLogin();
+            // await this.inicia();
+            if(await this.makeLogin()) {
+                await this.startMatch();
+                await this.inicia();
+            } else {
+                console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
+            }
             
         } catch(error) {
 
@@ -495,6 +524,9 @@ class Browser {
         if(this.player == "White") {
 
             while(true) {
+
+                await this.restart();
+
                 try{
                     if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
                         
@@ -502,12 +534,23 @@ class Browser {
                         return true;
                     }
                 } catch(NoSuchElementError) {
-                    continue;
+                    try {
+                        if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                        
+                            this.turn = true;
+                            return true;
+                        }
+                    } catch(error) {
+
+                    }
                 }
             }
         } else if(this.player == "Black") {
 
             while(true) {
+
+                await this.restart();
+                
                 try {
                     if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
                         
@@ -515,7 +558,15 @@ class Browser {
                         return true;
                     }
                 } catch(NoSuchElementError) {
-                    continue;
+                    try {
+                        if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                        
+                            this.turn = true;
+                            return true;
+                        }
+                    } catch(error) {
+                        
+                    } 
                 }
             }
         }
@@ -529,13 +580,16 @@ class Browser {
     }
 
     async boardToFen() {
-        
+
         while(true) {
+
+            await this.restart();
+
             try {
                 if(this.turn) {
 
                     await this.screenShot();
-
+                    
                     const fenRegex = /FEN:([\w\W]{0,})F/gm;
                     const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
 
@@ -543,14 +597,18 @@ class Browser {
                     let fen = fenRegex.exec(result);
                     let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                     fenString = fenString.replace('0 1', `0 ${this.moves}`);
+                    if(this.player == "Black")
+                        fenString = fenString.replace('w', 'b');
                     let accuracy = accuracyRegex.exec(result);
                     
-                    console.log(`FEN: ${fenString}`);
+                    console.log('--------------')
+                    console.log(`\nFEN: ${fenString}`);
                     console.log(accuracy[1]);
 
                     let object = await this.calculateMove(fenString);
                     // let bestMove = object.body.toString();
-                    console.log(`BestMove: ${object}`)
+                    console.log('--------------')
+                    console.log(`\nBest Move: ${object}`)
                     this.playMove = object;
 
                     if(this.playMove)
@@ -567,14 +625,21 @@ class Browser {
         try {
             
             const regex = /Best Move: ([\w\W]{4})/gm;
-            const board = /([\w\W]{0,}\+)/gm;
-            let result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
-            let move = regex.exec(result)
-            let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-            let b = board.exec(result)
-            let bor = b[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            const regexMate = /(Mate em: [\w\W]{0,})/gm;
+            let result;
 
-            // console.log(`Board View:\n\n${bor}`)
+            if(this.player == "White") {
+                result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
+            } else if(this.player == "Black") {
+                result = require('child_process').execSync(`python calculateMove.py -f "${fen}" -b`).toString();
+            }
+            let move = regex.exec(result);
+            let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            let mate = regexMate.exec(result);
+            let m = mate[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
+            console.log('--------------')
+            console.log(`\n${m}`);
 
             return bestMove
             
@@ -592,8 +657,11 @@ class Browser {
     }
 
     async getPlayerColor() {
-        
+
         while (true) {
+
+            await this.restart();
+
             try {
                 if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn')) || await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live player-clock'))) {
                     this.player = 'Black';
@@ -613,8 +681,8 @@ class Browser {
             }
         }
 
-        console.log(`Player: ${this.player}`);
-        console.log(`Oponent: ${this.oponent}`);
+        // console.log(`Player: ${this.player}`);
+        // console.log(`Oponent: ${this.oponent}`);
     }
 
 }

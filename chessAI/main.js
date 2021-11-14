@@ -489,7 +489,7 @@ class Browser {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
                 await this.driver.sleep(2000);
-                this.moves = 0;
+                this.moves = 1;
                 this.roque = true;
             }
         } catch(error) {
@@ -678,11 +678,14 @@ class Browser {
             
             if(/type': '([\w]{4})/gm.exec(m)) {
 
-                let mateem = /value': ([\d]{0,})}/gm.exec(m)
-                mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-
-                console.log('\n----------------------------------------------------')
-                console.log(`Mate em: ${mateem}`);
+                try {
+                    let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
+                    mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                    console.log('\n----------------------------------------------------')
+                    console.log(`Mate em: ${Math.abs(mateem)}`);
+                } catch(error) {
+                    console.log(error);
+                }
             }
 
             return bestMove

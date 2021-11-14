@@ -2,7 +2,7 @@ import sys
 from stockfish import Stockfish
 
 stockfish = Stockfish("stockfish14\\stockfish_14.1_win_x64_avx2.exe")
-stockfish.set_elo_rating(2800)
+stockfish.set_skill_level(8)
 
 entrada = sys.argv[1::]
 

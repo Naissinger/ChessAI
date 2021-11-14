@@ -44,8 +44,8 @@ class Browser {
         
         try {
             
-            this.login = 'EloRush';
-            this.password = 'b6?d7N4NZ-QkJi&';
+            this.login = 'Perceptronx';
+            this.password = '$xTL/!BA6q8_3aS';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -679,12 +679,23 @@ class Browser {
             if(/type': '([\w]{4})/gm.exec(m)) {
 
                 try {
-                    let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
-                    mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                    console.log('\n----------------------------------------------------')
-                    console.log(`Mate em: ${Math.abs(mateem)}`);
+                    if(/value': ([\d]{0,})}/gm.exec(m)) {
+                        let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
+                        mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                        console.log('\n----------------------------------------------------')
+                        console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
+                    }
                 } catch(error) {
-                    console.log(error);
+                    try {
+                        if(/value': ([\d\-]{0,})}/gm.exec(m)) {
+                            let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
+                            mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                            console.log('\n----------------------------------------------------')
+                            console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
+                        }
+                    } catch(error) {
+
+                    }
                 }
             }
 

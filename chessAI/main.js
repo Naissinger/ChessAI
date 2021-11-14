@@ -190,8 +190,8 @@ class Browser {
                 count = 0;
             }
         }
-        console.log('--------------')
-        console.log(`\nBoard View:`);
+        console.log('\n----------------------------------------------------')
+        console.log(`Board View:`);
         console.log(`\n${boardView}\n`);
     }
 
@@ -239,7 +239,7 @@ class Browser {
                     while(true) {
                         try {
                             await this.driver.findElement(By.className('home-username'))
-                            console.log('Login efetuado com sucesso.');
+                            console.log('\nLogin efetuado com sucesso.');
                             return true;
                         } catch(error) {
 
@@ -493,6 +493,30 @@ class Browser {
 
     async main() {
 
+        console.log(`
+/$$$$$$  /$$                                        
+/$$__  $$| $$                                    
+| $$  \__/| $$$$$$$   /$$$$$$   /$$$$$$$ /$$$$$$$
+| $$      | $$__  $$ /$$__  $$ /$$_____//$$_____/
+| $$      | $$  \ $$| $$$$$$$$|  $$$$$$|  $$$$$$  
+| $$    $$| $$  | $$| $$_____/ \____  $$\____  $$
+|  $$$$$$/| $$  | $$|  $$$$$$$ /$$$$$$$//$$$$$$$/
+\______/ |__/  |__/ \_______/|_______/|_______/`)
+
+        console.log(`
+   .::.
+   _::_
+ _/____\\_
+ \\      /
+  \\____/
+  (____)
+   |  |
+   |__|
+  /    \\
+ (______)
+(________)
+/________\\`)
+
         try {
             this.initialize();
 
@@ -601,14 +625,14 @@ class Browser {
                         fenString = fenString.replace('w', 'b');
                     let accuracy = accuracyRegex.exec(result);
                     
-                    console.log('--------------')
-                    console.log(`\nFEN: ${fenString}`);
+                    console.log('\n----------------------------------------------------')
+                    console.log(`FEN: ${fenString}`);
                     console.log(accuracy[1]);
 
                     let object = await this.calculateMove(fenString);
                     // let bestMove = object.body.toString();
-                    console.log('--------------')
-                    console.log(`\nBest Move: ${object}`)
+                    console.log('\n----------------------------------------------------')
+                    console.log(`Best Move: ${object}`)
                     this.playMove = object;
 
                     if(this.playMove)
@@ -625,7 +649,7 @@ class Browser {
         try {
             
             const regex = /Best Move: ([\w\W]{4})/gm;
-            const regexMate = /(Mate em: [\w\W]{0,})/gm;
+            let regexMate = /Mate em: ([\w\W]{0,})/gm;
             let result;
 
             if(this.player == "White") {
@@ -637,9 +661,15 @@ class Browser {
             let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             let mate = regexMate.exec(result);
             let m = mate[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            
+            if(/type': '([\w]{4})/gm.exec(m)) {
 
-            console.log('--------------')
-            console.log(`\n${m}`);
+                let mateem = /value': ([\d]{0,})}/gm.exec(m)
+                mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
+                console.log('\n----------------------------------------------------')
+                console.log(`Mate em: ${mateem}`);
+            }
 
             return bestMove
             

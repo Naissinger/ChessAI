@@ -6,7 +6,7 @@ ChessAI é um projeto pessoal com a ideia de implementar um robo para jogar xadr
 
 ### Sobre
 Por se tratar de um webdriver, ao executar a chamada `node chess.js` o chromedriver será iniciado e o robo automaticamente entrará em partidas online como convidado ou "Guest". É possível acompanhar no terminal a execução do programa, contendo informações sobre a situação atual da partida:
-
+![GameStatus](readme_images/gameStatus.png)
 ---
 
 ### Informações Importantes

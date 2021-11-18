@@ -11,7 +11,7 @@ Por se tratar de um webdriver, ao executar a chamada `node chess.js` o chromedri
 ![GameStatus](readme_images/gameStatus.PNG)
 
 
-É possível ver a jogada feita pelo Oponente, a jogada que será feita pelo Player a FEN do estado atual do tabuleiro e também uma representação visual simples do tabuleiro e a posição de cada peça no momento.
+É possível ver a jogada feita pelo Oponente, a jogada que será feita pelo Player, a FEN do estado atual do tabuleiro e também uma representação visual simples do tabuleiro e a posição de cada peça no momento.
 A todo instante o Stockfish verifica por uma possibilidade futura de Xeque-Mate e caso o encontre irá informá-lo no terminal em quantas jogadas isso ocorrerá:
 
 

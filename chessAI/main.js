@@ -20,6 +20,8 @@ class Browser {
         this.playMove;
         this.password;
         this.player;
+        this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        this.validateFen;
         this.oponent;
         this.roque = true;
         this.board = [
@@ -44,8 +46,8 @@ class Browser {
         
         try {
             
-            this.login = 'Perceptronx';
-            this.password = '$xTL/!BA6q8_3aS';
+            this.login = 'Perceptron-v2';
+            this.password = '.V6M:M-_qYw/)n9';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -191,7 +193,7 @@ class Browser {
                 count = 0;
             }
         }
-        console.log('\n----------------------------------------------------')
+        console.log('------------------------------------------------------------------');
         console.log(`Board View:`);
         console.log(`\n${boardView}\n`);
     }
@@ -219,8 +221,11 @@ class Browser {
         const chromeOptions = new chrome.Options();
 
         chromeOptions.addArguments("ignore-certificate-errors");
+        chromeOptions.addArguments('start-maximized');
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
+        chromeOptions.excludeSwitches("enable-automation")
+        chromeOptions.excludeSwitches("useAutomationExtension")
 
         this.driver = new Builder().withCapabilities(chromeOptions).build();
     }
@@ -260,7 +265,7 @@ class Browser {
             await this.driver.get('https://www.chess.com/play/online');
             await this.driver.sleep(1000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
 
         } finally {
@@ -278,13 +283,14 @@ class Browser {
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/a[1]')).click();
             await this.driver.sleep(2000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
             await this.driver.findElement(By.xpath('/html/body/div[22]/div/div/div[1]/div/label[4]')).click();
             await this.driver.findElement(By.id('guest-button')).click();
             await this.driver.sleep(2000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[3]/div/button[1]')).click();
+            await this.driver.sleep(1000);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
 
             await this.driver.wait(until.elementIsVisible(By.className('user-tagline-rating user-tagline-dark')));
@@ -329,8 +335,8 @@ class Browser {
 
     async inicia() {
         
-        // await this.turnHintsOn();
-        // await this.personalizeBoard(8, 4);
+        await this.turnHintsOn();
+        await this.personalizeBoard(8, 12);
 
         while(true) {
             await this.restart();
@@ -467,6 +473,14 @@ class Browser {
             
             await this.driver.sleep(1000);
 
+            this.fen = this.validateFen;
+
+            try {
+                await this.promotion();
+            }catch(error) {
+
+            }
+
             if(await this.getPlayerTurn()) {
                 console.log('\nSeu Turno!');
                 this.moves++;
@@ -483,17 +497,45 @@ class Browser {
         }
     }
 
+    async promotion() {
+
+        if(this.player == "Black") {
+            try {
+                await this.driver.findElement(By.className('promotion-piece bq')).click();
+            }catch(error) {
+
+            }
+        } else if(this.player == "White") {
+            try {
+                await this.driver.findElement(By.className('promotion-piece wq')).click();
+            }catch(error) {
+                
+            }
+        }
+    }
+
     async restart() {
 
         try {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
-                await this.driver.sleep(2000);
+                await this.driver.sleep(3000);
                 this.moves = 1;
                 this.roque = true;
+                this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             }
         } catch(error) {
-            
+            try{
+                if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[2]'))) {
+                    await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[2]')).click();
+                    await this.driver.sleep(3000);
+                    this.moves = 1;
+                    this.roque = true;
+                    this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+                }
+            } catch(error) {
+
+            }
         }
     }
 
@@ -525,17 +567,15 @@ class Browser {
 
         try {
             this.initialize();
-
-            await this.driver.manage().window().maximize();
             
-            // await this.noLogin();
-            // await this.inicia();
-            if(await this.makeLogin()) {
-                await this.startMatch();
-                await this.inicia();
-            } else {
-                console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
-            }
+            await this.noLogin();
+            await this.inicia();
+            // if(await this.makeLogin()) {
+            //     await this.startMatch();
+            //     await this.inicia();
+            // } else {
+            //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
+            // }
             
         } catch(error) {
 
@@ -609,6 +649,122 @@ class Browser {
         }
     }
 
+    async pegaJogadaOponente() {
+        
+        let jogada = {
+            "first": 0,
+            "second": 0
+        }
+
+        let array = [
+            1, 2, 3, 4, 5, 6
+        ];
+        let classAttribute = '';
+        let classAttribute2 = '';
+
+        while(true) {
+            try {
+                const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
+
+            
+                for(let i = 0; i < array.length; i++) {
+                    try {
+                        let highlight = await this.driver.findElement(By.xpath(`//*[@id="${id}"]/div[${array[i]}]`)).getAttribute('class');
+                        if(/(highlight)/gm.exec(highlight) && classAttribute == '') {
+                            classAttribute = highlight;
+                        } else if(/(highlight)/gm.exec(highlight) && classAttribute2 == '') {
+                            classAttribute2 = highlight;
+                        }
+                    } catch(error) {
+                        console.log(error);
+                    }
+                }
+                
+
+                classAttribute = classAttribute.split("-")
+                classAttribute2 = classAttribute2.split("-")
+
+                const arrayPecas = await this.verificaPecaInvertida();
+                
+                for(let i = 0; i < arrayPecas.length; i++) {
+                    try {
+                        if(await this.driver.findElement(By.className(`piece ${arrayPecas[i]} square-${classAttribute[1]}`))) {
+                            jogada.first = classAttribute2[1];
+                            jogada.second = classAttribute[1];
+
+                            return jogada;
+                        }
+                    } catch(error) {
+
+                    }
+                }
+
+                jogada.first = classAttribute[1];
+                jogada.second = classAttribute2[1];
+
+                return jogada;
+
+            } catch(error) {
+
+            }
+        }
+    }
+
+    async verificaPecaInvertida() {
+
+        const array = [
+            "br", "bn", "bb", "bk", "bq", "bp",
+            "wr", "wn", "wb", "wk", "wq", "wp",
+        ]
+
+        return array;
+    }
+
+    async converteNumeroEmCasa(number) {
+
+        if(this.player == "White") {
+            switch(number) {
+
+                case 1:
+                    return 'a'
+                case 2:
+                    return 'b'
+                case 3:
+                    return 'c'
+                case 4:
+                    return 'd'
+                case 5:
+                    return 'e'
+                case 6:
+                    return 'f'
+                case 7:
+                    return 'g'
+                case 8:
+                    return 'h'
+            }
+        } else if(this.player == "Black") {
+            switch(number) {
+
+                case 1:
+                    return 'a'
+                case 2:
+                    return 'b'
+                case 3:
+                    return 'c'
+                case 4:
+                    return 'd'
+                case 5:
+                    return 'e'
+                case 6:
+                    return 'f'
+                case 7:
+                    return 'g'
+                case 8:
+                    return 'h'
+            }
+        }
+    }
+
     async boardToFen() {
 
         while(true) {
@@ -618,39 +774,87 @@ class Browser {
             try {
                 if(this.turn) {
 
-                    await this.screenShot();
-                    
-                    const fenRegex = /FEN:([\w\W]{0,})F/gm;
-                    const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
 
-                    let result = require('child_process').execSync("python tensorflow_chessbot.py --filepath board.png").toString();
-                    let fen = fenRegex.exec(result);
-                    let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                    fenString = fenString.replace('0 1', `0 ${this.moves}`);
+                    let jogadaOponente = await this.pegaJogadaOponente();
                     
-                    if(this.roque) {
-                        fenString = fenString.replace('w -', 'w KQkq');
-                    }
-                    if(this.player == "Black") {
-                        fenString = fenString.replace('w', 'b');
-                        if(this.roque){
-                            fenString = fenString.replace('b -', 'b KQkq');
+                    if(jogadaOponente != undefined && jogadaOponente.first != "" && jogadaOponente.second != "" && jogadaOponente.first != undefined) {
+
+                        try {
+                            
+                            let firstx = jogadaOponente.first.toString().split("");
+                            let first = await this.converteNumeroEmCasa(parseInt(firstx[0]));
+                            let secondx = jogadaOponente.second.toString().split("");
+                            let second = await this.converteNumeroEmCasa(parseInt(secondx[0]));
+
+                            let oponentMove = first + firstx[1] + second + secondx[1];
+                            
+                            console.log('------------------------------------------------------------------');
+                            console.log(`Oponent Move: ${oponentMove}`);
+
+                            let result = require('child_process').execSync(`python calculateMove.py -m "${oponentMove}" -f "${this.fen}"`).toString();
+                            const regex = /FEN: ([\w\W]{0,})/gm;
+                            let fen = regex.exec(result);
+                            let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                            console.log('------------------------------------------------------------------');
+                            console.log(`FEN: ${fenString}`);
+                            
+                            let object = await this.calculateMove(fenString);
+                            this.playMove = object;
+
+                            if(this.playMove)
+                                break;
+
+                        } catch(error) {
+                            console.log(error);
+                        }
+                    } else {
+                        try {
+                            let object = await this.calculateMove(this.fen);
+                            
+                            this.playMove = object;
+
+                            if(this.playMove)
+                                    break;
+
+                        } catch(error) {
+
                         }
                     }
-                    let accuracy = accuracyRegex.exec(result);
-                    
-                    console.log('\n----------------------------------------------------')
-                    console.log(`FEN: ${fenString}`);
-                    console.log(accuracy[1]);
+                    // } else {
+                    //     await this.screenShot();
+                        
+                    //     const fenRegex = /FEN:([\w\W]{0,})F/gm;
+                    //     const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
 
-                    let object = await this.calculateMove(fenString);
-                    // let bestMove = object.body.toString();
-                    console.log('\n----------------------------------------------------')
-                    console.log(`Best Move: ${object}`)
-                    this.playMove = object;
+                    //     let result = require('child_process').execSync("python tensorflow_chessbot.py --filepath board.png").toString();
+                    //     let fen = fenRegex.exec(result);
+                    //     let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                    //     fenString = fenString.replace('0 1', `0 ${this.moves}`);
+                        
+                    //     if(this.roque) {
+                    //         fenString = fenString.replace('w -', 'w KQkq');
+                    //     }
+                    //     if(this.player == "Black") {
+                    //         fenString = fenString.replace('w', 'b');
+                    //         if(this.roque){
+                    //             fenString = fenString.replace('b -', 'b KQkq');
+                    //         }
+                    //     }
+                    //     let accuracy = accuracyRegex.exec(result);
+                        
+                    //     console.log('\n----------------------------------------------------')
+                    //     console.log(`FEN: ${fenString}`);
+                    //     console.log(accuracy[1]);
 
-                    if(this.playMove)
-                        break;
+                    //     let object = await this.calculateMove(fenString);
+                    //     // let bestMove = object.body.toString();
+                    //     console.log('\n----------------------------------------------------')
+                    //     console.log(`Best Move: ${object}`)
+                    //     this.playMove = object;
+
+                    //     if(this.playMove)
+                    //         break;
+                    // }
                 }
             } catch(error) {
                 console.log(error)
@@ -661,21 +865,27 @@ class Browser {
     async calculateMove(fen) {
         
         try {
-            
             const regex = /Best Move: ([\w\W]{4})/gm;
+            const fenRegex = /FEN: ([\w\W]{0,})/gm;
+
             let regexMate = /Mate em: ([\w\W]{0,})/gm;
             let result;
 
             if(this.player == "White") {
                 result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
             } else if(this.player == "Black") {
-                result = require('child_process').execSync(`python calculateMove.py -f "${fen}" -b`).toString();
+                result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
             }
             let move = regex.exec(result);
             let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             let mate = regexMate.exec(result);
             let m = mate[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-            
+            let fenResult = fenRegex.exec(result);
+            this.validateFen = fenResult[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            console.log('------------------------------------------------------------------');
+            console.log(`Best Player Move: ${bestMove}`);
+            console.log('------------------------------------------------------------------');
+
             if(/type': '([\w]{4})/gm.exec(m)) {
 
                 try {
@@ -684,31 +894,19 @@ class Browser {
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                         console.log('\n----------------------------------------------------')
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
+                    } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
+                        let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
+                        mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+                        console.log('\n----------------------------------------------------')
+                        console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
                     }
                 } catch(error) {
-                    try {
-                        if(/value': ([\d\-]{0,})}/gm.exec(m)) {
-                            let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
-                            mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                            console.log('\n----------------------------------------------------')
-                            console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
-                        }
-                    } catch(error) {
-
-                    }
+        
                 }
             }
 
             return bestMove
             
-            let response = await request('POST', `https://chess.apurn.com/nextmove`, {
-                body: `${fen}`,
-                headers: {
-                    'Content-Type': 'text/plain'
-                  }
-            });
-
-            return response;
         } catch(error) {
             console.log(error);
         }

@@ -9,8 +9,8 @@ Por se tratar de uma interação com webdriver é `OBRIGATÓRIO` a instalação 
 Você pode encontrar para download todas as versões do chromedriver no seguinte link: https://chromedriver.chromium.org/downloads
 
 **Lembrando que existem duas opções de instalação para o webdriver**:
-  .1 Salvar o binário, `chromedriver.exe` em uma pasta de sua escolha e adicionar essa pasta ao `PATH` do seu sistema.
-  .2 Você pode adicionar o binário `chromedriver.exe` diretamente dentro do diretório `ChessAI/Bot` do repositório.
+.1 Salvar o binário, `chromedriver.exe` em uma pasta de sua escolha e adicionar essa pasta ao `PATH` do seu sistema.
+.2 Você pode adicionar o binário `chromedriver.exe` diretamente dentro do diretório `ChessAI/Bot` do repositório.
   
 ### Instalação
 

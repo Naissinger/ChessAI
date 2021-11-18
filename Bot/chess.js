@@ -4,6 +4,7 @@ const util = require('util');
 const fs = require('fs');
 const writeFile = util.promisify(fs.writeFile);
 const request = require('sync-request');
+const { assert } = require('console');
 
 class Browser {
 
@@ -16,14 +17,12 @@ class Browser {
         this.turn = false;
         this.hintsOn = false;
         this.notEatandMove = 0;
-        this.moves = 1;
         this.playMove;
         this.password;
         this.player;
         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         this.validateFen;
         this.oponent;
-        this.roque = true;
         this.board = [
             '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '',
@@ -46,8 +45,8 @@ class Browser {
         
         try {
             
-            this.login = 'Perceptron-v2';
-            this.password = '.V6M:M-_qYw/)n9';
+            this.login = 'Elucidationn';
+            this.password = 'Xde,X#:8*/,&v&U';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -219,20 +218,42 @@ class Browser {
         
         const chrome = require("selenium-webdriver/chrome");
         const chromeOptions = new chrome.Options();
-
+        
         chromeOptions.addArguments("ignore-certificate-errors");
         chromeOptions.addArguments('start-maximized');
         chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments('--disable-dev-shm-usage')
+        chromeOptions.addArguments("--disable-extensions")
+        chromeOptions.addArguments("--disable-gpu")
+        chromeOptions.addArguments("--disable-setuid-sandbox");
         chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
         chromeOptions.excludeSwitches("enable-automation")
         chromeOptions.excludeSwitches("useAutomationExtension")
-
+       
         this.driver = new Builder().withCapabilities(chromeOptions).build();
+        
+    }
+
+    async converteObjetoPython(cookiePython) {
+
+        const aspas = /'/gm;
+        const asp = `"`;
+        const res = cookiePython.replace(aspas, asp);
+        const verdadeiro = /True/gm;
+        const verd = `true`;
+        const r = res.replace(verdadeiro, verd);
+        const falso = /False/gm;
+        const fal = `false`;
+        let result = r.replace(falso, fal);
+        result = JSON.parse(result);
+
+        return result;
     }
 
     async makeLogin() {
 
-        if(await this.getLogin()) {
+        while(true) {
+            if(await this.getLogin()) {
                 try {
 
                     await this.driver.get('https://www.chess.com/')
@@ -242,34 +263,28 @@ class Browser {
                     await this.driver.findElement(By.id('password')).sendKeys(this.password);
                     await this.driver.findElement(By.id('login')).click();
 
-                    while(true) {
-                        try {
-                            await this.driver.findElement(By.className('home-username'))
-                            console.log('\nLogin efetuado com sucesso.');
-                            return true;
-                        } catch(error) {
+                    await this.driver.sleep(3000);
+                    await this.driver.findElement(By.className('home-username'));
 
-                        }
-                    }
+                    return true;
 
                 } catch(NoSuchElementError) {
                     
                 }
+            }
         }
     }
 
     async startMatch() {
 
         try {
-
             await this.driver.get('https://www.chess.com/play/online');
             await this.driver.sleep(1000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
-
-        } finally {
-
+        } catch(error) {
+            return false
         }
 
         return true;
@@ -336,7 +351,7 @@ class Browser {
     async inicia() {
         
         await this.turnHintsOn();
-        await this.personalizeBoard(8, 12);
+        await this.personalizeBoard(28, 12);
 
         while(true) {
             await this.restart();
@@ -483,7 +498,6 @@ class Browser {
 
             if(await this.getPlayerTurn()) {
                 console.log('\nSeu Turno!');
-                this.moves++;
                 this.hintsOn = true;
             }
         } catch(error) {
@@ -519,18 +533,14 @@ class Browser {
         try {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
-                await this.driver.sleep(3000);
-                this.moves = 1;
-                this.roque = true;
+                await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             }
         } catch(error) {
             try{
                 if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[2]'))) {
                     await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[2]')).click();
-                    await this.driver.sleep(3000);
-                    this.moves = 1;
-                    this.roque = true;
+                    await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                     this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
                 }
             } catch(error) {
@@ -566,12 +576,13 @@ class Browser {
 /________\\`)
 
         try {
-            this.initialize();
+            await this.initialize();
             
             await this.noLogin();
             await this.inicia();
+           
             // if(await this.makeLogin()) {
-            //     await this.startMatch();
+            //     await this.startMatch()
             //     await this.inicia();
             // } else {
             //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');

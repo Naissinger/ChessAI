@@ -4,6 +4,11 @@ ChessAI é um projeto pessoal com a ideia de implementar um robo para jogar xadr
 
 ---
 
+### Sobre
+Por se tratar de um webdriver, ao executar a chamada `node chess.js` o chromedriver será iniciado e o robo automaticamente entrará em partidas online como convidado ou "Guest". É possível acompanhar no terminal a execução do programa, contendo informações sobre a situação atual da partida:
+
+---
+
 ### Informações Importantes
 A ideia do ChessAI foi pensada para utilizar a automação do navegador com webdriver através de um script javascript utilizando o módulo SeleniumJS.
 Por se tratar de uma interação com webdriver é `OBRIGATÓRIO` a instalação do mesmo, tendo sido, o projeto, originalmente feito com o chromedriver.
@@ -24,3 +29,9 @@ pip install stockfish
 Este módulo stockfish basicamente será a interface que fará a comunicação entre o script chess.js e a engine do Stockfish 14.1
 - `npm install`
 Este comando será necessário para instalar as dependências do projeto e para garantir o funcionamente correto de todas as funcionalidades.
+
+---
+
+### Considerações
+
+O Objetivo por trás desse projeto é inteiramente educacional, com o foco no aprendizado de algumas tecnologias e também 

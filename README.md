@@ -11,6 +11,16 @@ Por se tratar de um webdriver, ao executar a chamada `node chess.js` o chromedri
 ![GameStatus](readme_images/gameStatus.PNG)
 
 
+É possível ver a jogada feita pelo Oponente, a jogada que será feita pelo Player a FEN do estado atual do tabuleiro e também uma representação visual simples do tabuleiro e a posição de cada peça no momento.
+A todo instante o Stockfish verifica por uma possibilidade futura de Xeque-Mate e caso o encontre irá informá-lo no terminal em quantas jogadas isso ocorrerá:
+
+
+![MateEm](readme_images/mateEm.PNG)
+
+
+As promoções de peões estão configuradas para promover para uma Dama ou Rainha sempre que ocorrerem.
+Ao final de cada partida, o Bot irá buscar a próxima partida automaticamente.
+
 ---
 
 ### Informações Importantes
@@ -38,4 +48,8 @@ Este comando será necessário para instalar as dependências do projeto e para 
 
 ### Considerações
 
-O Objetivo por trás desse projeto é inteiramente educacional, com o foco no aprendizado de algumas tecnologias e também 
+O Objetivo por trás desse projeto é inteiramente educacional, com o foco no aprendizado de algumas tecnologias e também para realizar um desejo que sempre tive de cumprir esse projeto. Sinta-se livre para utilizá-lo da forma que desejar, peço que por gentileza, não utilize este projeto para fins que prejudiquem a qualquer pessoa, ou para ganho pessoal. **Mantenha a esportividade sempre e divirta-se :)**
+
+Estarei a dispocição para qualquer dúvida ou problema.
+
+Naissinger.

@@ -2,6 +2,8 @@
 
 ChessAI é um projeto pessoal com a ideia de implementar um robo para jogar xadrez no site Chess.com
 
+---
+
 ### Informações Importantes
 A ideia do ChessAI foi pensada para utilizar a automação do navegador com webdriver através de um script javascript utilizando o módulo SeleniumJS.
 Por se tratar de uma interação com webdriver é `OBRIGATÓRIO` a instalação do mesmo, tendo sido, o projeto, originalmente feito com o chromedriver.
@@ -12,6 +14,8 @@ Você pode encontrar para download todas as versões do chromedriver no seguinte
   1. Salvar o binário, `chromedriver.exe` em uma pasta de sua escolha e adicionar essa pasta ao `PATH` do seu sistema.
   2. Você pode adicionar o binário `chromedriver.exe` diretamente dentro do diretório `ChessAI/Bot` do repositório.
   
+---
+
 ### Instalação
 
 - `pip install stockfish` 

@@ -869,12 +869,12 @@ class Browser {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
-                        console.log('\n----------------------------------------------------')
+                        console.log('------------------------------------------------------------------');
                     } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
                         console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
-                        console.log('\n----------------------------------------------------')
+                        console.log('------------------------------------------------------------------');
                     }
                 } catch(error) {
         

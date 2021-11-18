@@ -18,7 +18,8 @@ Você pode encontrar para download todas as versões do chromedriver no seguinte
 
 ### Instalação
 
-- `pip install stockfish`\n
+- `pip install stockfish`
+
 Este módulo stockfish basicamente será a interface que fará a comunicação entre o script chess.js e a engine do Stockfish 14.1
 - `npm install`
 Este comando será necessário para instalar as dependências do projeto e para garantir o funcionamente correto de todas as funcionalidades.

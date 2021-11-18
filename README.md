@@ -48,8 +48,8 @@ Este comando será necessário para instalar as dependências do projeto e para 
 
 ### Considerações
 
-O Objetivo por trás desse projeto é inteiramente educacional, com o foco no aprendizado de algumas tecnologias e também para realizar um desejo que sempre tive de cumprir esse projeto. Sinta-se livre para utilizá-lo da forma que desejar, peço que por gentileza, não utilize este projeto para fins que prejudiquem a qualquer pessoa, ou para ganho pessoal. **Mantenha a esportividade sempre e divirta-se :)**
+O Objetivo por trás desse projeto é inteiramente educacional, com o foco no aprendizado de algumas tecnologias e também para realizar um desejo que sempre tive de cumprir esse projeto. Sinta-se livre para utilizá-lo da forma que desejar, porém peço que por gentileza, não utilize este projeto para fins que prejudiquem a qualquer pessoa, ou para ganho pessoal. **Mantenha a esportividade sempre e divirta-se :)**
 
-Estarei a dispocição para qualquer dúvida ou problema.
+Estarei a disposição para qualquer dúvida ou problema.
 
 Naissinger.

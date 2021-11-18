@@ -820,41 +820,6 @@ class Browser {
 
                         }
                     }
-                    // } else {
-                    //     await this.screenShot();
-                        
-                    //     const fenRegex = /FEN:([\w\W]{0,})F/gm;
-                    //     const accuracyRegex = /(Final Certainty: [\d\.\%]{0,})/gm;
-
-                    //     let result = require('child_process').execSync("python tensorflow_chessbot.py --filepath board.png").toString();
-                    //     let fen = fenRegex.exec(result);
-                    //     let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                    //     fenString = fenString.replace('0 1', `0 ${this.moves}`);
-                        
-                    //     if(this.roque) {
-                    //         fenString = fenString.replace('w -', 'w KQkq');
-                    //     }
-                    //     if(this.player == "Black") {
-                    //         fenString = fenString.replace('w', 'b');
-                    //         if(this.roque){
-                    //             fenString = fenString.replace('b -', 'b KQkq');
-                    //         }
-                    //     }
-                    //     let accuracy = accuracyRegex.exec(result);
-                        
-                    //     console.log('\n----------------------------------------------------')
-                    //     console.log(`FEN: ${fenString}`);
-                    //     console.log(accuracy[1]);
-
-                    //     let object = await this.calculateMove(fenString);
-                    //     // let bestMove = object.body.toString();
-                    //     console.log('\n----------------------------------------------------')
-                    //     console.log(`Best Move: ${object}`)
-                    //     this.playMove = object;
-
-                    //     if(this.playMove)
-                    //         break;
-                    // }
                 }
             } catch(error) {
                 console.log(error)

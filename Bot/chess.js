@@ -848,7 +848,7 @@ class Browser {
             let fenResult = fenRegex.exec(result);
             this.validateFen = fenResult[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             console.log('------------------------------------------------------------------');
-            console.log(`Best Player Move: ${bestMove}`);
+            console.log(`Player Move: ${bestMove}`);
             console.log('------------------------------------------------------------------');
 
             if(/type': '([\w]{4})/gm.exec(m)) {
@@ -857,13 +857,13 @@ class Browser {
                     if(/value': ([\d]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                        console.log('\n----------------------------------------------------')
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
+                        console.log('\n----------------------------------------------------')
                     } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                        console.log('\n----------------------------------------------------')
                         console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
+                        console.log('\n----------------------------------------------------')
                     }
                 } catch(error) {
         

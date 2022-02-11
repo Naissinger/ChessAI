@@ -320,21 +320,20 @@ class Browser {
             await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[1]/div[2]/main/div/div/section[1]/div[2]/div[2]/form/button')), 0);
             await this.driver.findElement(By.className('nav-link-component nav-link-new-main-design nav-link-top-level sprite play-top')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/a[1]')).click();
-            await this.driver.sleep(2000);
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')), 0);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
             await this.driver.wait(until.elementLocated(By.id('guest-button')), 0);
             await this.driver.findElement(By.id('guest-button')).click();
-            await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 0);
-            await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
-            await this.driver.sleep(2000);
-            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            // await this.driver.sleep(1000);
-            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
-
-            await this.driver.wait(until.elementLocated(By.className('user-tagline-rating user-tagline-dark')));
+            try {
+                await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 6000);
+                await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
+            } catch(e) {
+                await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 6000);
+                await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+            }
+            await this.driver.wait(until.elementLocated(By.className('user-tagline-rating user-tagline-dark')), 0);
                 
         } catch(e) {
             console.log(e);
@@ -634,7 +633,6 @@ class Browser {
     }
 
     async getUrl() {
-
         return await this.driver.getCurrentUrl();
     }
 
@@ -892,12 +890,14 @@ class Browser {
             } else if(this.player == "Black") {
                 result = require('child_process').execSync(`python calculateMove.py -f "${fen}"`).toString();
             }
+
             let move = regex.exec(result);
             let bestMove = move[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             let mate = regexMate.exec(result);
             let m = mate[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             let fenResult = fenRegex.exec(result);
             this.validateFen = fenResult[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
             console.log('------------------------------------------------------------------');
             console.log(`Player Move: ${bestMove}`);
             console.log('------------------------------------------------------------------');
@@ -921,7 +921,7 @@ class Browser {
                 }
             }
 
-            return bestMove
+            return bestMove;
             
         } catch(error) {
             console.log(error);
@@ -952,9 +952,6 @@ class Browser {
                 }
             }
         }
-
-        // console.log(`Player: ${this.player}`);
-        // console.log(`Oponent: ${this.oponent}`);
     }
 
 }

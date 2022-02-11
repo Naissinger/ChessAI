@@ -16,12 +16,12 @@ if(entrada[0] == "-f"):
             print(fen)
             stockfish.set_fen_position(fen)
             print(f'Board View:\n\n{stockfish.get_board_visual()}')
-            print(f'\nBest Move: {stockfish.get_best_move_time(1000)}\n')
+            print(f'\nBest Move: {stockfish.get_best_move_time(100)}\n')
             print(f'Mate em: {stockfish.get_evaluation()}')
         else:
             stockfish.set_fen_position(entrada[1])
             print(f'Board View:\n\n{stockfish.get_board_visual()}')
-            move = stockfish.get_best_move_time(1000)
+            move = stockfish.get_best_move_time(100)
             print(f'\nBest Move: {move}\n')
             stockfish.make_moves_from_current_position([move])
             print(f'Mate em: {stockfish.get_evaluation()}')
@@ -29,7 +29,7 @@ if(entrada[0] == "-f"):
     except:
         stockfish.set_fen_position(entrada[1])
         print(f'Board View:\n\n{stockfish.get_board_visual()}')
-        move = stockfish.get_best_move_time(1000)
+        move = stockfish.get_best_move_time(100)
         print(f'\nBest Move: {move}\n')
         stockfish.make_moves_from_current_position([move])
         print(f'Mate em: {stockfish.get_evaluation()}')

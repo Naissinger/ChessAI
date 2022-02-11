@@ -6,10 +6,11 @@ const writeFile = util.promisify(fs.writeFile);
 const request = require('sync-request');
 const { assert } = require('console');
 
+
 class Browser {
 
     constructor() {
-        
+
         this.driver;
         this.urlAtual;
         this.estado;
@@ -217,20 +218,33 @@ class Browser {
     async initialize() {
         
         const chrome = require("selenium-webdriver/chrome");
-        const chromeOptions = new chrome.Options();
+        let options = new chrome.Options();
         
-        chromeOptions.addArguments("ignore-certificate-errors");
-        chromeOptions.addArguments('start-maximized');
-        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments('--disable-dev-shm-usage')
-        chromeOptions.addArguments("--disable-extensions")
-        chromeOptions.addArguments("--disable-gpu")
-        chromeOptions.addArguments("--disable-setuid-sandbox");
-        chromeOptions.addArguments("--disable-blink-features=AutomationControlled");
-        chromeOptions.excludeSwitches("enable-automation")
-        chromeOptions.excludeSwitches("useAutomationExtension")
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--no-first-run");
+        options.addArguments("--no-default-browser-check");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--enable-webgl");
+        options.addArguments("--start-maximized");
+        options.addArguments("--disable-web-security");
+        options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+        options.addArguments("--allow-running-insecure-content");
+        options.addArguments("test-type");
+        options.addArguments("start-maximized");
+        options.addArguments("--js-flags=--expose-gc");
+        options.addArguments("--enable-precise-memory-info");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-default-apps");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--no-sandbox");
+
+        options.excludeSwitches('enable-logging');
+        options.excludeSwitches('--enable-automation');
+        options.excludeSwitches('useAutomationExtension=false');
+        options.excludeSwitches('--useAutomationExtension=false');
        
-        this.driver = new Builder().withCapabilities(chromeOptions).build();
+        this.driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
         
     }
 
@@ -252,31 +266,40 @@ class Browser {
 
     async makeLogin() {
 
+        if(await this.getLogin()) {
+            try {
+
+                await this.driver.get('https://www.chess.com/')
+                await this.driver.findElement(By.className('button auth login ui_v5-button-component ui_v5-button-primary')).click();
+                await this.driver.wait(until.elementLocated(By.id('username')), 0);
+                await this.driver.findElement(By.id('username')).sendKeys(this.login);
+                await this.driver.findElement(By.id('password')).sendKeys(this.password);
+                await this.driver.findElement(By.id('login')).click();
+
+                return true;
+
+            } catch(NoSuchElementError) {
+                
+            }
+        }
+    }
+
+    async cloudFlareByPass() {
+
         while(true) {
-            if(await this.getLogin()) {
-                try {
+            try {
+                
+                const element = await this.driver.findElement(By.className('home-username'));
 
-                    await this.driver.get('https://www.chess.com/')
-                    await this.driver.findElement(By.className('button auth login ui_v5-button-component ui_v5-button-primary')).click();
-                    await this.driver.sleep(1000);
-                    await this.driver.findElement(By.id('username')).sendKeys(this.login);
-                    await this.driver.findElement(By.id('password')).sendKeys(this.password);
-                    await this.driver.findElement(By.id('login')).click();
-
-                    await this.driver.sleep(3000);
-                    await this.driver.findElement(By.className('home-username'));
-
-                    return true;
-
-                } catch(NoSuchElementError) {
-                    
-                }
+                break;
+            } catch(e) {
+                continue;
             }
         }
     }
 
     async startMatch() {
-
+        console.log('Buscando Partida...')
         try {
             await this.driver.get('https://www.chess.com/play/online');
             await this.driver.sleep(1000);
@@ -294,37 +317,45 @@ class Browser {
 
         try {
             await this.driver.get('https://www.chess.com');
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[1]/div[2]/main/div/div/section[1]/div[2]/div[2]/form/button')), 10000);
-            await this.driver.findElement(By.className('nav-link-component nav-link-main-link nav-link-top-level sprite play-top')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[1]/div[2]/main/div/div/section[1]/div[2]/div[2]/form/button')), 0);
+            await this.driver.findElement(By.className('nav-link-component nav-link-new-main-design nav-link-top-level sprite play-top')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/a[1]')).click();
             await this.driver.sleep(2000);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
-            await this.driver.findElement(By.xpath('/html/body/div[22]/div/div/div[1]/div/label[4]')).click();
+            await this.driver.wait(until.elementLocated(By.id('guest-button')), 0);
             await this.driver.findElement(By.id('guest-button')).click();
+            await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 0);
+            await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
             await this.driver.sleep(2000);
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.sleep(1000);
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
+            // await this.driver.sleep(1000);
+            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            // await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
 
-            await this.driver.wait(until.elementIsVisible(By.className('user-tagline-rating user-tagline-dark')));
+            await this.driver.wait(until.elementLocated(By.className('user-tagline-rating user-tagline-dark')));
                 
-        } catch(NoSuchElementError) {
-            
+        } catch(e) {
+            console.log(e);
         } 
     }
 
     async turnHintsOn() {
-        await this.driver.findElement(By.id('board-controls-settings')).click();
-        await this.driver.sleep(1500);
-        await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label/div')).click();
-        await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
+        await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
+        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')), 0);
+        const element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
+    
+        if(element == "rgba(119, 155, 77, 1)") {
+            await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[3]/button[1]')).click();
+        } else {
+            await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).click();
+            await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
+        }
     }
 
     async personalizeBoard(piece, board) {
-        await this.driver.findElement(By.id('board-controls-settings')).click();
+        await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
         await this.driver.sleep(1500);
         await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')).click();
         await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[2]/select/option[${piece}]`)).click();
@@ -453,6 +484,7 @@ class Browser {
                 var piecePos = square + splitMove[1];
                 var piecePos = parseInt(piecePos);
                 var piece = await this.piece(piecePos);
+
                 await this.driver.findElement(By.className(`piece ${piece} square-${piecePos}`)).click();
 
                 var squareHint = await this.numberConvert(splitMove[2]);
@@ -484,9 +516,13 @@ class Browser {
 
                 }
             }
-            
-            await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-            
+
+            try {
+                await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
+            } catch(e) {
+                console.log(e);
+            }
+
             await this.driver.sleep(1000);
 
             this.fen = this.validateFen;
@@ -532,8 +568,8 @@ class Browser {
     async restart() {
 
         try {
-            if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]'))) {
-                await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[2]')).click();
+            if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[1]'))) {
+                await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[2]/div[1]/button[1]')).click();
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
             }
@@ -564,7 +600,6 @@ class Browser {
 
         console.log(`
    .::.
-   _::_
  _/____\\_
  \\      /
   \\____/
@@ -583,15 +618,19 @@ class Browser {
             await this.inicia();
            
             // if(await this.makeLogin()) {
-            //     await this.startMatch()
+            //     await this.startMatch();
             //     await this.inicia();
             // } else {
             //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
             // }
             
         } catch(error) {
-
+            console.log(error);
         }
+    }
+
+    async myFunc(arg) {
+        console.log(`arg was => ${arg}`);
     }
 
     async getUrl() {

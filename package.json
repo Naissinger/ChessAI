@@ -21,6 +21,7 @@
     "requests": "^0.3.0",
     "selenium-webdriver": "^4.0.0",
     "sync-request": "^6.1.0",
+    "timers": "^0.1.1",
     "util": "^0.12.4"
   },
   "devDependencies": {

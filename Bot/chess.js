@@ -156,6 +156,7 @@ class Browser {
 
     async updateBoard(boardArray) {
         
+        await this.restart();
         await this.clearBoard();
         
         for(let i = 0; i < boardArray.length; i++) {
@@ -199,6 +200,8 @@ class Browser {
     }
 
     async getBoardState() {
+
+        await this.restart();
 
         const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
 
@@ -326,13 +329,21 @@ class Browser {
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
             await this.driver.wait(until.elementLocated(By.id('guest-button')), 0);
             await this.driver.findElement(By.id('guest-button')).click();
-            try {
-                await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 6000);
-                await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
-            } catch(e) {
-                await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 6000);
-                await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+
+            while(true) {
+                try {
+                    console.log('saiu');
+                    await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 6000);
+                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
+                    break;
+                } catch(e) {
+                    console.log('entrou');
+                    await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 6000);
+                    await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+                    break;
+                }
             }
+
             await this.driver.wait(until.elementLocated(By.className('user-tagline-rating user-tagline-dark')), 0);
                 
         } catch(e) {
@@ -355,7 +366,7 @@ class Browser {
 
     async personalizeBoard(piece, board) {
         await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
-        await this.driver.sleep(1500);
+        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')), 0);
         await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')).click();
         await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[2]/select/option[${piece}]`)).click();
         await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[3]/select')).click();
@@ -519,10 +530,9 @@ class Browser {
             try {
                 await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
             } catch(e) {
+                await this.getBoardState();
                 console.log(e);
             }
-
-            await this.driver.sleep(1000);
 
             this.fen = this.validateFen;
 
@@ -533,17 +543,10 @@ class Browser {
             }
 
             if(await this.getPlayerTurn()) {
-                console.log('\nSeu Turno!');
                 this.hintsOn = true;
             }
         } catch(error) {
-            try {
-                if(this.hintsOn == false) {
-                    await this.turnHintsOn();
-                }
-            } catch(error) {
-                console.log(error);
-            }
+            await this.getBoardState();
         }
     }
 

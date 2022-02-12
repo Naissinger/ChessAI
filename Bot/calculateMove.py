@@ -3,13 +3,15 @@ from stockfish import Stockfish
 
 stockfish = Stockfish("stockfish14\\stockfish_14.1_win_x64_avx2.exe")
 stockfish.set_elo_rating(3500)
-stockfish.set_depth(99)
 
 entrada = sys.argv[1::]
 
 if(entrada[0] == "-f"):
     
     try:
+
+        print('\nCalculando jogada...\n')
+
         if(entrada[2] == "-b"):
             entradaSplit = entrada[1].split(" b")
             fen = entradaSplit[0][::-1]

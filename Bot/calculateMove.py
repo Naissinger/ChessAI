@@ -17,13 +17,13 @@ if(entrada[0] == "-f"):
             print(fen)
 
             stockfish.set_fen_position(fen)
-            
-            print(f'\nBest Move: {stockfish.get_best_move_time(100)}\n')
+
+            print(f'\nBest Move: {stockfish.get_best_move_time(10)}\n')
             print(f'Mate em: {stockfish.get_evaluation()}')
         else:
             stockfish.set_fen_position(entrada[1])
             
-            move = stockfish.get_best_move_time(100)
+            move = stockfish.get_best_move_time(10)
             
             print(f'\nBest Move: {move}\n')
             
@@ -34,7 +34,7 @@ if(entrada[0] == "-f"):
     except:
         stockfish.set_fen_position(entrada[1])
 
-        move = stockfish.get_best_move_time(100)
+        move = stockfish.get_best_move_time(10)
 
         print(f'\nBest Move: {move}\n')
 

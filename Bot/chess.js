@@ -576,13 +576,19 @@ class Browser {
             }
         } catch(error) {
             try{
-                if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
-                    await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
-                    await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
-                    this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+                if(await this.driver.findElement(By.className('icon-font-chess x game-review-popup-close'))) {
+                    await this.driver.findElement(By.className('icon-font-chess x game-review-popup-close')).click();
                 }
             } catch(error) {
-
+                try {
+                    if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
+                        await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
+                        await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
+                        this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+                    }
+                } catch(e) {
+                    
+                }
             }
         }
     }

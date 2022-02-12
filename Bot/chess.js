@@ -332,14 +332,12 @@ class Browser {
 
             while(true) {
                 try {
-                    console.log('saiu');
-                    await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 6000);
-                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
+                    await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 5000);
+                    await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
                     break;
                 } catch(e) {
-                    console.log('entrou');
-                    await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 6000);
-                    await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+                    await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 5000);
+                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
                     break;
                 }
             }
@@ -530,10 +528,11 @@ class Browser {
             try {
                 await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
             } catch(e) {
-                await this.getBoardState();
                 console.log(e);
             }
 
+            await this.driver.sleep(1000);
+            
             this.fen = this.validateFen;
 
             try {
@@ -546,7 +545,7 @@ class Browser {
                 this.hintsOn = true;
             }
         } catch(error) {
-            await this.getBoardState();
+
         }
     }
 

@@ -636,10 +636,6 @@ class Browser {
         }
     }
 
-    async myFunc(arg) {
-        console.log(`arg was => ${arg}`);
-    }
-
     async getUrl() {
         return await this.driver.getCurrentUrl();
     }
@@ -915,11 +911,13 @@ class Browser {
                     if(/value': ([\d]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
                         console.log('------------------------------------------------------------------');
                     } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+
                         console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
                         console.log('------------------------------------------------------------------');
                     }

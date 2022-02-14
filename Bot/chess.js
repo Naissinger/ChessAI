@@ -319,10 +319,7 @@ class Browser {
     async noLogin() {
 
         try {
-            await this.driver.get('https://www.chess.com');
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[1]/div[2]/main/div/div/section[1]/div[2]/div[2]/form/button')), 0);
-            await this.driver.findElement(By.className('nav-link-component nav-link-new-main-design nav-link-top-level sprite play-top')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/a[1]')).click();
+            await this.driver.get('https://www.chess.com/play/online');
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')), 0);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();

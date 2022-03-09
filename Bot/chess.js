@@ -20,6 +20,7 @@ class Browser {
         this.notEatandMove = 0;
         this.playMove;
         this.password;
+        this.logged;
         this.player;
         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         this.validateFen;
@@ -247,8 +248,7 @@ class Browser {
         options.excludeSwitches('useAutomationExtension=false');
         options.excludeSwitches('--useAutomationExtension=false');
        
-        this.driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build();
-        
+        this.driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build(); 
     }
 
     async converteObjetoPython(cookiePython) {
@@ -269,22 +269,21 @@ class Browser {
 
     async makeLogin() {
 
-        if(await this.getLogin()) {
-            try {
+        let result = require('child_process').execSync(`python login.py`).toString();
+        
+        let cookies = JSON.parse(/(\[[\w\W]*?])/gm.exec(result)[0]);
+        
+        await this.driver.get("https://www.chess.com/play");
 
-                await this.driver.get('https://www.chess.com/')
-                await this.driver.findElement(By.className('button auth login ui_v5-button-component ui_v5-button-primary')).click();
-                await this.driver.wait(until.elementLocated(By.id('username')), 0);
-                await this.driver.findElement(By.id('username')).sendKeys(this.login);
-                await this.driver.findElement(By.id('password')).sendKeys(this.password);
-                await this.driver.findElement(By.id('login')).click();
-
-                return true;
-
-            } catch(NoSuchElementError) {
-                
-            }
+        for (let i = 0; i < cookies.length; i++)
+        {
+            await this.driver.manage().addCookie(cookies[i]);
         }
+       
+        await this.driver.navigate().refresh();
+
+        this.logged = true;
+        return true;
     }
 
     async cloudFlareByPass() {
@@ -347,15 +346,28 @@ class Browser {
     }
 
     async turnHintsOn() {
-        await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
-        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')), 0);
-        const element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
-    
-        if(element == "rgba(119, 155, 77, 1)") {
-            await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[3]/button[1]')).click();
-        } else {
-            await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).click();
-            await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
+        while (true)
+        {
+            try
+            {
+                await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
+                await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')), 0);
+                const element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
+                
+                if(element == "rgba(119, 155, 77, 1)" || element == "#779b4d") {
+                    let elem = await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-basic-light settings-modal-container-button'));
+                    
+                    await elem.click();
+                    break;
+                } else {
+                    await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).click();
+                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
+                    break;
+                }
+            } catch(e)
+            {
+                console.log(e);
+            }
         }
     }
 
@@ -387,8 +399,11 @@ class Browser {
 
     async inicia() {
         
-        await this.turnHintsOn();
-        await this.personalizeBoard(28, 12);
+        if(!this.logged)
+        {
+            await this.turnHintsOn();
+            await this.personalizeBoard(28, 12);
+        }
 
         while(true) {
             await this.restart();
@@ -618,15 +633,15 @@ class Browser {
         try {
             await this.initialize();
             
-            await this.noLogin();
-            await this.inicia();
+            // await this.noLogin();
+            // await this.inicia();
            
-            // if(await this.makeLogin()) {
-            //     await this.startMatch();
-            //     await this.inicia();
-            // } else {
-            //     console.log('Houve um erro ao efetuar login. Verifique as credenciais.');
-            // }
+            if(await this.makeLogin()) {
+                await this.startMatch();
+                await this.inicia();
+            } else {
+                console.log('\nHouve um erro ao efetuar login. Verifique as credenciais.\n');
+            }
             
         } catch(error) {
             console.log(error);

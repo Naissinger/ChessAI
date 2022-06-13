@@ -165,11 +165,17 @@ class Browser {
         
         for(let i = 0; i < boardArray.length; i++) {
             
-            if(boardArray[i] != '') {
+            if(boardArray[i] != '' && boardArray[i] != undefined) {
                 var nome = await boardArray[i].split(" ");
                 var posicao = await boardArray[i].split("-");
             
                 var piece = await this.relacaoEntrePecas(nome[1]);
+
+                if (piece == undefined)
+                {
+                    piece = await this.relacaoEntrePecas(nome[2]);
+                }
+
                 var pos = await this.relacaoEntreCasas(parseInt(posicao[1]));
 
                 this.board[pos] = piece;
@@ -181,23 +187,23 @@ class Browser {
             }
         }
 
-        let count = 0;
-        let boardView = '';
+        // let count = 0;
+        // let boardView = '';
 
-        for(let i = 0; i < 64; i++) {
+        // for(let i = 0; i < 64; i++) {
             
-            if(this.board[i] == '') {
-                boardView = boardView + `[ ]`
-            } else {
-                boardView = boardView + `[${this.board[i]}]`
-            }
+        //     if(this.board[i] == '') {
+        //         boardView = boardView + `[ ]`
+        //     } else {
+        //         boardView = boardView + `[${this.board[i]}]`
+        //     }
             
-            count++;
-            if(count == 8) {
-                boardView = boardView + '\n';
-                count = 0;
-            }
-        }
+        //     count++;
+        //     if(count == 8) {
+        //         boardView = boardView + '\n';
+        //         count = 0;
+        //     }
+        // }
         // console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
         // console.log(`\nBoard View:`);
         // console.log(`\n${boardView}`);
@@ -210,11 +216,14 @@ class Browser {
         const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
 
         let boardArray = [];
-
-        for(let i = 4; i <= 64; i++) {
+        
+        for(let i = 0; i < 64; i++) {
             try {
-                boardArray.push(await this.driver.findElement(By.xpath(`//*[@id="${id}"]/div[${i}]`)).getAttribute("class"));
-            } catch(NoSuchElementError) {
+                let element = await this.driver.findElement(By.xpath(`//*[@id="${id}"]/div[${i}]`)).getAttribute("class")
+                
+                if (/(piece)/gm.exec(element))
+                    boardArray.push(element);
+            } catch(error) {
                 continue;
             }
         }
@@ -463,11 +472,19 @@ class Browser {
     async piece(pos) {
         
         var index = await this.relacaoEntreCasas(pos);
+        var peca = await this.relacaoPecas(this.board[index]);
 
-        if(this.board[index] == "K" || this.board[index] == "k" || this.board[index] == "R" || this.board[index] == "r") {
-            this.roque = false;
+        if (peca == undefined)
+        {
+            await this.getBoardState();
+
+            index = await this.relacaoEntreCasas(pos);
+            peca = await this.relacaoPecas(this.board[index]);
+
+            return peca;
         }
-        return await this.relacaoPecas(this.board[index]);
+
+        return peca;
     }
 
     async negras(number) {
@@ -531,32 +548,26 @@ class Browser {
                 try {
                     var element = await this.driver.findElement(By.className(`capture-hint square-${piecePosHint}`));
                     this.notEatandMove = 0;
-                }catch(error) {
-
-                }
+                }catch(error) { }
             }
 
             try {
                 await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
-            } catch(e) {
-                console.log(e);
-            }
+            } catch(e) { }
 
-            await this.driver.sleep(1000);
+            // await this.driver.sleep(1000);
             
             this.fen = this.validateFen;
 
             try {
                 await this.promotion();
-            }catch(error) {
-
-            }
+            }catch(error) { }
 
             if(await this.getPlayerTurn()) {
                 this.hintsOn = true;
             }
-        } catch(error) {
-
+        } catch(error) { 
+            console.log(error);
         }
     }
 
@@ -581,9 +592,9 @@ class Browser {
 
         try {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]'))) {
+                console.log('\nIniciando outra partida...');
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]')).click();
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
-                console.log('\nIniciando outra partida...');
                 await this.driver.sleep(2000);
                 console.clear();
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -597,9 +608,9 @@ class Browser {
             } catch(error) {
                 try {
                     if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
+                        console.log('\nIniciando outra partida...');
                         await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
-                        console.log('\nIniciando outra partida...');
                         await this.driver.sleep(2000);
                         console.clear();
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";

@@ -5,6 +5,7 @@ const fs = require('fs');
 const writeFile = util.promisify(fs.writeFile);
 const request = require('sync-request');
 const { assert } = require('console');
+const { threadId } = require('worker_threads');
 
 
 class Browser {
@@ -24,6 +25,8 @@ class Browser {
         this.player;
         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         this.validateFen;
+        this.beautyBoard = '';
+        this.jogada = 0;
         this.oponent;
         this.board = [
             '', '', '', '', '', '', '', '',
@@ -195,9 +198,9 @@ class Browser {
                 count = 0;
             }
         }
-        console.log('------------------------------------------------------------------');
-        console.log(`Board View:`);
-        console.log(`\n${boardView}\n`);
+        // console.log('------------------------------------------------------------------------------');
+        // console.log(`\nBoard View:`);
+        // console.log(`\n${boardView}`);
     }
 
     async getBoardState() {
@@ -319,27 +322,23 @@ class Browser {
 
         try {
             await this.driver.get('https://www.chess.com/play/online');
-            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')), 0);
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="sb"]/div[3]/a[2]')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="sb"]/div[3]/a[2]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[1]/a[1]/div[2]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
             await this.driver.wait(until.elementLocated(By.id('guest-button')), 0);
             await this.driver.findElement(By.id('guest-button')).click();
 
-            while(true) {
-                try {
-                    await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')), 5000);
-                    await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
-                    break;
-                } catch(e) {
-                    await this.driver.wait(until.elementLocated(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')), 5000);
-                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary ui_v5-button-large ui_v5-button-full')).click();
-                    break;
-                }
-            }
+            await this.driver.sleep(1000);
+            await this.driver.get('https://www.chess.com/play/online');
+           
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
 
-            await this.driver.wait(until.elementLocated(By.className('user-tagline-rating user-tagline-dark')), 0);
-                
         } catch(e) {
             console.log(e);
         } 
@@ -373,9 +372,9 @@ class Browser {
 
     async personalizeBoard(piece, board) {
         await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
-        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')), 0);
-        await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')).click();
-        await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[2]/select/option[${piece}]`)).click();
+        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[9]/div[2]/div[2]/div/div[2]/select')), 0);
+        await this.driver.findElement(By.xpath('/html/body/div[9]/div[2]/div[2]/div/div[2]/select')).click();
+        await this.driver.findElement(By.xpath(`/html/body/div[9]/div[2]/div[2]/div/div[2]/select/option[28]`)).click();
         await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[3]/select')).click();
         await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[3]/select/option[${board}]`)).click();
         await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
@@ -401,8 +400,8 @@ class Browser {
         
         if(!this.logged)
         {
-            await this.turnHintsOn();
-            await this.personalizeBoard(28, 12);
+            // await this.turnHintsOn();
+            // await this.personalizeBoard(28, 12);
         }
 
         while(true) {
@@ -585,6 +584,7 @@ class Browser {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]')).click();
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+                this.jogada = 0;
             }
         } catch(error) {
             try{
@@ -597,6 +597,7 @@ class Browser {
                         await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+                        this.jogada = 0;
                     }
                 } catch(e) {
                     
@@ -633,15 +634,15 @@ class Browser {
         try {
             await this.initialize();
             
-            // await this.noLogin();
-            // await this.inicia();
+            await this.noLogin();
+            await this.inicia();
            
-            if(await this.makeLogin()) {
-                await this.startMatch();
-                await this.inicia();
-            } else {
-                console.log('\nHouve um erro ao efetuar login. Verifique as credenciais.\n');
-            }
+            // if(await this.makeLogin()) {
+            //     await this.startMatch();
+            //     await this.inicia();
+            // } else {
+            //     console.log('\nHouve um erro ao efetuar login. Verifique as credenciais.\n');
+            // }
             
         } catch(error) {
             console.log(error);
@@ -853,14 +854,14 @@ class Browser {
 
                             let oponentMove = first + firstx[1] + second + secondx[1];
                             
-                            console.log('------------------------------------------------------------------');
-                            console.log(`Oponent Move: ${oponentMove}`);
+                            console.log('------------------------------------------------------------------------------');
+                            console.log(`Oponente Jogou: ${oponentMove}`);
 
                             let result = require('child_process').execSync(`python calculateMove.py -m "${oponentMove}" -f "${this.fen}"`).toString();
-                            const regex = /FEN: ([\w\W]{0,})/gm;
+                            const regex = /FEN: ([\w\W]*?)\n/gm;
                             let fen = regex.exec(result);
                             let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                            console.log('------------------------------------------------------------------');
+                            console.log('------------------------------------------------------------------------------');
                             console.log(`FEN: ${fenString}`);
                             
                             let object = await this.calculateMove(fenString);
@@ -913,9 +914,16 @@ class Browser {
             let m = mate[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             let fenResult = fenRegex.exec(result);
             this.validateFen = fenResult[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
+            this.beautyBoard = /(\+[\w\W]*?h)/gm.exec(result);
 
-            console.log('------------------------------------------------------------------');
-            console.log(`Player Move: ${bestMove}`);
+            console.log('------------------------------------------------------------------------------');
+            console.log(`Você Jogou: ${bestMove}`);
+            this.jogada += 1;
+            console.log('------------------------------------------------------------------------------');
+            console.log('Jogada: ' + this.jogada);
+            console.log('------------------------------------------------------------------------------');
+            console.log(`\nVisão do Tabuleiro:`);
+            console.log(`\n ${this.beautyBoard[0]}\n`);
 
             if(/type': '([\w]{4})/gm.exec(m)) {
 
@@ -924,14 +932,14 @@ class Browser {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
 
+                        console.log('------------------------------------------------------------------------------');
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
-                        console.log('------------------------------------------------------------------');
                     } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
 
+                        console.log('------------------------------------------------------------------------------');
                         console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
-                        console.log('------------------------------------------------------------------');
                     }
                 } catch(error) {
         

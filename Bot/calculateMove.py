@@ -2,7 +2,7 @@ import sys
 from stockfish import Stockfish
 
 stockfish = Stockfish("stockfish14\\stockfish_14.1_win_x64_avx2.exe")
-stockfish.set_skill_level(14)
+stockfish.set_skill_level(20)
 
 entrada = sys.argv[1::]
 
@@ -15,15 +15,15 @@ if(entrada[0] == "-f"):
             fen = fen + ' b' + entradaSplit[1]
 
             print(fen)
-
             stockfish.set_fen_position(fen)
 
-            print(f'\nBest Move: {stockfish.get_best_move_time(100)}\n')
+            print(f'\nBest Move: {stockfish.get_best_move_time(1000)}\n')
             print(f'Mate em: {stockfish.get_evaluation()}')
+            print(stockfish.get_board_visual())
         else:
             stockfish.set_fen_position(entrada[1])
-            
-            move = stockfish.get_best_move_time(100)
+
+            move = stockfish.get_best_move_time(1000)
             
             print(f'\nBest Move: {move}\n')
             
@@ -31,21 +31,24 @@ if(entrada[0] == "-f"):
 
             print(f'Mate em: {stockfish.get_evaluation()}')
             print(f'FEN: {stockfish.get_fen_position()}')
+            print(stockfish.get_board_visual())
     except:
         stockfish.set_fen_position(entrada[1])
-
-        move = stockfish.get_best_move_time(100)
-
+        move = stockfish.get_best_move_time(1000)
+        
         print(f'\nBest Move: {move}\n')
 
         stockfish.make_moves_from_current_position([move])
 
         print(f'Mate em: {stockfish.get_evaluation()}')
         print(f'FEN: {stockfish.get_fen_position()}')
+        print(stockfish.get_board_visual())
 elif(entrada[0] == "-m"):
 
     stockfish.set_fen_position(entrada[3])
+    
     stockfish.make_moves_from_current_position([entrada[1]])
 
     print(f'FEN: {stockfish.get_fen_position()}')
+    print(stockfish.get_board_visual())
 

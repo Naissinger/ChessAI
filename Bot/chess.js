@@ -601,12 +601,7 @@ class Browser {
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                 console.clear();
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
-                if (this.player == "White")
-                    this.jogada = 1;
-
-                if (this.player == "Black")
-                    this.jogada = 0;
+                this.jogada = 0;
             }
         } catch(error) {
             try{
@@ -621,12 +616,7 @@ class Browser {
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                         console.clear();
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-                        
-                        if (this.player == "White")
-                            this.jogada = 1;
-
-                        if (this.player == "Black")
-                            this.jogada = 0;
+                        this.jogada = 0;
                     }
                 } catch(e) {
                     

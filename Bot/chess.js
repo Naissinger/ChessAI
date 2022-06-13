@@ -198,7 +198,7 @@ class Browser {
                 count = 0;
             }
         }
-        // console.log('------------------------------------------------------------------------------');
+        // console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
         // console.log(`\nBoard View:`);
         // console.log(`\n${boardView}`);
     }
@@ -583,6 +583,10 @@ class Browser {
             if(await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]'))) {
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]')).click();
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
+                console.log('\nIniciando outra partida...');
+                setTimeout(() => {
+                    console.clear()
+                }, 2000);
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
                 this.jogada = 0;
             }
@@ -596,6 +600,10 @@ class Browser {
                     if(await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus'))) {
                         await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
+                        console.log('\nIniciando outra partida...');
+                        setTimeout(() => {
+                            console.clear()
+                        }, 2000);
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
                         this.jogada = 0;
                     }
@@ -629,7 +637,7 @@ class Browser {
   /    \\
  (______)
 (________)
-/________\\`)
+/________\\  By: Cisco\n`)
 
         try {
             await this.initialize();
@@ -854,14 +862,14 @@ class Browser {
 
                             let oponentMove = first + firstx[1] + second + secondx[1];
                             
-                            console.log('------------------------------------------------------------------------------');
+                            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
                             console.log(`Oponente Jogou: ${oponentMove}`);
 
                             let result = require('child_process').execSync(`python calculateMove.py -m "${oponentMove}" -f "${this.fen}"`).toString();
                             const regex = /FEN: ([\w\W]*?)\n/gm;
                             let fen = regex.exec(result);
                             let fenString = fen[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
-                            console.log('------------------------------------------------------------------------------');
+                            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
                             console.log(`FEN: ${fenString}`);
                             
                             let object = await this.calculateMove(fenString);
@@ -916,14 +924,14 @@ class Browser {
             this.validateFen = fenResult[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
             this.beautyBoard = /(\+[\w\W]*?h)/gm.exec(result);
 
-            console.log('------------------------------------------------------------------------------');
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
             console.log(`Você Jogou: ${bestMove}`);
             this.jogada += 1;
-            console.log('------------------------------------------------------------------------------');
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
             console.log('Jogada: ' + this.jogada);
-            console.log('------------------------------------------------------------------------------');
-            console.log(`\nVisão do Tabuleiro:`);
-            console.log(`\n ${this.beautyBoard[0]}\n`);
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
+            console.log(`\n        Visão do Tabuleiro`);
+            console.log(`\n${this.beautyBoard[0]}\n`);
 
             if(/type': '([\w]{4})/gm.exec(m)) {
 
@@ -932,13 +940,13 @@ class Browser {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
 
-                        console.log('------------------------------------------------------------------------------');
+                        console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
                         console.log(`Mate das Brancas em: ${Math.abs(mateem)}`);
                     } else if(/value': ([\d\-]{0,})}/gm.exec(m)) {
                         let mateem = /value': ([\d\-]{0,})}/gm.exec(m);
                         mateem = mateem[1].replace(/(?:\\[rn]|[\r\n]+)+/g, "");
 
-                        console.log('------------------------------------------------------------------------------');
+                        console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
                         console.log(`Mate das Negras em: ${Math.abs(mateem)}`);
                     }
                 } catch(error) {

@@ -566,8 +566,12 @@ class Browser {
             if(await this.getPlayerTurn()) {
                 this.hintsOn = true;
             }
+
+            this.jogada += 1;
+            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
+            console.log('Jogada: ' + this.jogada);
         } catch(error) { 
-            console.log(error);
+            
         }
     }
 
@@ -597,7 +601,12 @@ class Browser {
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                 console.clear();
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-                this.jogada = 0;
+
+                if (this.player == "White")
+                    this.jogada = 1;
+
+                if (this.player == "Black")
+                    this.jogada = 0;
             }
         } catch(error) {
             try{
@@ -612,7 +621,12 @@ class Browser {
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
                         console.clear();
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-                        this.jogada = 0;
+                        
+                        if (this.player == "White")
+                            this.jogada = 1;
+
+                        if (this.player == "Black")
+                            this.jogada = 0;
                     }
                 } catch(e) {
                     
@@ -757,7 +771,7 @@ class Browser {
                             classAttribute2 = highlight;
                         }
                     } catch(error) {
-                        console.log(error);
+                        
                     }
                 }
                 
@@ -886,7 +900,7 @@ class Browser {
                                 break;
 
                         } catch(error) {
-                            console.log(error);
+                            
                         }
                     } else {
                         try {
@@ -903,7 +917,7 @@ class Browser {
                     }
                 }
             } catch(error) {
-                console.log(error)
+                
             }
         }
     }
@@ -933,9 +947,7 @@ class Browser {
 
             console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
             console.log(`Você Jogou: ${bestMove}`);
-            this.jogada += 1;
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
-            console.log('Jogada: ' + this.jogada);
+            
             console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
             console.log(`\n        Visão do Tabuleiro`);
             console.log(`\n${this.beautyBoard[0]}\n`);
@@ -964,7 +976,7 @@ class Browser {
             return bestMove;
             
         } catch(error) {
-            console.log(error);
+            
         }
     }
 

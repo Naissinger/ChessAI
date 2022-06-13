@@ -595,7 +595,6 @@ class Browser {
                 console.log('\nIniciando outra partida...');
                 await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div[3]/div[1]/button[1]')).click();
                 await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
-                await this.driver.sleep(2000);
                 console.clear();
                 this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
                 this.jogada = 0;
@@ -611,7 +610,6 @@ class Browser {
                         console.log('\nIniciando outra partida...');
                         await this.driver.findElement(By.className('ui_v5-button-icon icon-font-chess plus')).click();
                         await this.driver.wait(until.elementLocated(By.className('resign-button-label')), 30000);
-                        await this.driver.sleep(2000);
                         console.clear();
                         this.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
                         this.jogada = 0;

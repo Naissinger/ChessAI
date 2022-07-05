@@ -12,6 +12,7 @@
     "axios": "^0.24.0",
     "child_process": "^1.0.2",
     "cloudflare-scraper": "^1.0.8",
+    "decompress": "^4.2.1",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
     "pil": "^0.1.1",

@@ -6,6 +6,7 @@ const writeFile = util.promisify(fs.writeFile);
 const request = require('sync-request');
 const { assert } = require('console');
 const { threadId } = require('worker_threads');
+const path = require('path');
 
 
 class Browser {
@@ -234,6 +235,7 @@ class Browser {
     async initialize() {
         
         const chrome = require("selenium-webdriver/chrome");
+        const { ServiceBuilder } = require('selenium-webdriver/chrome');
         let options = new chrome.Options();
         
         options.addArguments("--disable-blink-features=AutomationControlled");
@@ -259,8 +261,11 @@ class Browser {
         options.excludeSwitches('--enable-automation');
         options.excludeSwitches('useAutomationExtension=false');
         options.excludeSwitches('--useAutomationExtension=false');
-       
-        this.driver = await new Builder().forBrowser('chrome').setChromeOptions(options).build(); 
+        
+        const chromePath = path.join("..\\drivers\\", "chromedriver.exe");
+        const serviceBuilder = new ServiceBuilder(chromePath);
+        
+        this.driver = await new Builder().forBrowser('chrome').setChromeService(serviceBuilder).setChromeOptions(options).build(); 
     }
 
     async converteObjetoPython(cookiePython) {
@@ -633,6 +638,14 @@ class Browser {
         }
     }
 
+    async atualizaDrivers()
+    {
+        return new Promise((resolve, reject) => {
+            require('child_process').execSync("node ..\\drivers\\updateDrivers.js");
+            resolve();
+        })
+    }
+
     async main() {
 
         console.log(`
@@ -659,6 +672,7 @@ class Browser {
 /________\\  By: Cisco\n`)
 
         try {
+            await this.atualizaDrivers();
             await this.initialize();
             
             await this.noLogin();

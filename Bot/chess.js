@@ -51,8 +51,8 @@ class Browser {
         
         try {
             
-            this.login = 'Elucidationn';
-            this.password = 'Xde,X#:8*/,&v&U';
+            this.login = 'Percepronz';
+            this.password = 'Champion321';
             
             if(this.password != '' && this.login != '') {
                 return true;
@@ -286,20 +286,16 @@ class Browser {
 
     async makeLogin() {
 
-        let result = require('child_process').execSync(`python login.py`).toString();
-        
-        let cookies = JSON.parse(/(\[[\w\W]*?])/gm.exec(result)[0]);
-        
-        await this.driver.get("https://www.chess.com/play");
+        await this.driver.get('https://www.chess.com/login');
+        await this.driver.wait(until.elementLocated(By.id('username')), 0);
+        await this.driver.findElement(By.id('username')).sendKeys('Percepronz');
+        await this.driver.wait(until.elementLocated(By.id('password')), 0);
+        await this.driver.findElement(By.id('password')).sendKeys('Champion321');
 
-        for (let i = 0; i < cookies.length; i++)
-        {
-            await this.driver.manage().addCookie(cookies[i]);
-        }
-       
-        await this.driver.navigate().refresh();
+        const element = await this.driver.findElement(By.id('login'));
 
-        this.logged = true;
+        await element.click();
+
         return true;
     }
 
@@ -321,11 +317,27 @@ class Browser {
         console.log('Buscando Partida...')
         try {
             await this.driver.get('https://www.chess.com/play/online');
-            await this.driver.sleep(1000);
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div/div[1]/div[1]/div/button')).click();
+
+            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[34]/div[2]/div/div/div[3]/button')), 0);
+            const teste = await this.driver.findElement(By.xpath('/html/body/div[34]/div[2]/div/div/div[3]/button'));
+
+            await this.driver.executeScript((teste) => {
+                teste.scrollIntoView({block: 'center'})
+            }, teste)
+
+            teste.click();
+            
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')), 0);
+            await this.driver.findElement(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')).click();
+            await this.driver.findElement(By.xpath('//*[@id="guest-button"]')).click();
+
         } catch(error) {
+            console.log(error);
             return false
         }
 
@@ -358,6 +370,13 @@ class Browser {
             {
                 await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
                 await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')), 0);
+
+                const button = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label'));
+                
+                await this.driver.executeScript((button) => {
+                    button.scrollIntoView({block: 'center'});
+                }, button);
+                
                 const element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
                 
                 if(element == "rgba(119, 155, 77, 1)" || element == "#779b4d") {
@@ -419,12 +438,9 @@ class Browser {
     }
 
     async inicia() {
-        
-        if(!this.logged)
-        {
-            // await this.turnHintsOn();
-            await this.personalizeBoard(28, 12);
-        }
+    
+        await this.turnHintsOn();
+        await this.personalizeBoard(28, 12);
 
         while(true) {
             await this.restart();
@@ -993,7 +1009,6 @@ class Browser {
     }
 
     async getPlayerColor() {
-
         while (true) {
 
             await this.restart();

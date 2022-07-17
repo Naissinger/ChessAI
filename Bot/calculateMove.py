@@ -1,7 +1,8 @@
 import sys
 from stockfish import Stockfish
 
-stockfish = Stockfish("stockfish14\\stockfish_14.1_win_x64_avx2.exe")
+stockfish = Stockfish("stockfish15\\stockfish_15_x64_avx2.exe")
+
 stockfish.set_skill_level(20)
 
 entrada = sys.argv[1::]

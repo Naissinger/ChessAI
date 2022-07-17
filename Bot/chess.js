@@ -1,13 +1,9 @@
 const {Builder, By, Key, until, WebElement, WebDriver, Actions} = require('selenium-webdriver');
-const { spawn } = require('child_process');
 const util = require('util');
 const fs = require('fs');
 const writeFile = util.promisify(fs.writeFile);
-const request = require('sync-request');
-const { assert } = require('console');
-const { threadId } = require('worker_threads');
 const path = require('path');
-
+const cp = require('child_process');
 
 class Browser {
 
@@ -252,20 +248,20 @@ class Browser {
         options.addArguments("start-maximized");
         options.addArguments("--js-flags=--expose-gc");
         options.addArguments("--enable-precise-memory-info");
-        options.addArguments("--disable-popup-blocking");
         options.addArguments("--disable-default-apps");
         options.addArguments("--disable-infobars");
         options.addArguments("--no-sandbox");
-
+        
         options.excludeSwitches('enable-logging');
         options.excludeSwitches('--enable-automation');
         options.excludeSwitches('useAutomationExtension=false');
         options.excludeSwitches('--useAutomationExtension=false');
+        options.excludeSwitches('--disable-popup-blocking');
         
-        const chromePath = path.join("..\\drivers\\", "chromedriver.exe");
+        const chromePath = path.join(__dirname + "\\..\\drivers\\", "chromedriver.exe");
         const serviceBuilder = new ServiceBuilder(chromePath);
         
-        this.driver = await new Builder().forBrowser('chrome').setChromeService(serviceBuilder).setChromeOptions(options).build(); 
+        this.driver = await new Builder().forBrowser('chrome').setChromeService(serviceBuilder).setChromeOptions(options).build();
     }
 
     async converteObjetoPython(cookiePython) {
@@ -288,9 +284,9 @@ class Browser {
 
         await this.driver.get('https://www.chess.com/login');
         await this.driver.wait(until.elementLocated(By.id('username')), 0);
-        await this.driver.findElement(By.id('username')).sendKeys('Percepronz');
+        await this.driver.findElement(By.id('username')).sendKeys('NoMoreStringsOnMe');
         await this.driver.wait(until.elementLocated(By.id('password')), 0);
-        await this.driver.findElement(By.id('password')).sendKeys('Champion321');
+        await this.driver.findElement(By.id('password')).sendKeys('Perceptron123');
 
         const element = await this.driver.findElement(By.id('login'));
 
@@ -314,34 +310,17 @@ class Browser {
     }
 
     async startMatch() {
-        console.log('Buscando Partida...')
-        try {
+        try
+        {
             await this.driver.get('https://www.chess.com/play/online');
 
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[34]/div[2]/div/div/div[3]/button')), 0);
-            const teste = await this.driver.findElement(By.xpath('/html/body/div[34]/div[2]/div/div/div[3]/button'));
-
-            await this.driver.executeScript((teste) => {
-                teste.scrollIntoView({block: 'center'})
-            }, teste)
-
-            teste.click();
-            
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')), 0);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')), 0);
-            await this.driver.findElement(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')).click();
-            await this.driver.findElement(By.xpath('//*[@id="guest-button"]')).click();
 
-        } catch(error) {
-            console.log(error);
-            return false
         }
-
-        return true;
+        catch(e) { console.log(e) } 
     }
 
     async noLogin() {
@@ -363,36 +342,32 @@ class Browser {
         catch(e) { } 
     }
 
-    async turnHintsOn() {
-        while (true)
-        {
-            try
-            {
-                await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
-                await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')), 0);
+    async turnHintsOn(piece, board) {
 
-                const button = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label'));
-                
-                await this.driver.executeScript((button) => {
-                    button.scrollIntoView({block: 'center'});
-                }, button);
-                
-                const element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
-                
-                if(element == "rgba(119, 155, 77, 1)" || element == "#779b4d") {
-                    let elem = await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-basic-light settings-modal-container-button'));
-                    
-                    await elem.click();
-                    break;
-                } else {
-                    await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).click();
-                    await this.driver.findElement(By.className('ui_v5-button-component ui_v5-button-primary settings-modal-container-button')).click();
-                    break;
-                }
-            } catch(e)
-            {
-                console.log(e);
+        try {
+            console.log('teste');
+            await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
+
+            let element = await this.driver.findElement(By.xpath('//*[@id="highlightLegalMoves"]'));
+
+            await this.driver.executeScript((element) => {
+                element.scrollIntoView({block: 'center'});
+            }, element);
+
+            element = await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[11]/div[1]/label')).getCssValue("background-color");
+
+            if(element == "rgba(119, 155, 77, 1)" || element == "#779b4d") {
+                await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[3]/button[1]')).click();
             }
+            else
+            {
+                await this.driver.findElement(By.xpath('//*[@id="highlightLegalMoves"]')).click();
+                await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[3]/button[2]')).click();
+            }
+        }
+        catch(e)
+        {
+            console.log(e);
         }
     }
 
@@ -438,8 +413,7 @@ class Browser {
     }
 
     async inicia() {
-    
-        await this.turnHintsOn();
+        // await this.turnHintsOn(28, 12);
         await this.personalizeBoard(28, 12);
 
         while(true) {
@@ -583,8 +557,6 @@ class Browser {
             try {
                 await this.driver.actions({bridge: true}).move({x: 0, y: 0, origin: element}).press().perform();
             } catch(e) { }
-
-            // await this.driver.sleep(1000);
             
             this.fen = this.validateFen;
 
@@ -690,16 +662,13 @@ class Browser {
         try {
             await this.atualizaDrivers();
             await this.initialize();
-            
+
             await this.noLogin();
             await this.inicia();
            
-            // if(await this.makeLogin()) {
-            //     await this.startMatch();
-            //     await this.inicia();
-            // } else {
-            //     console.log('\nHouve um erro ao efetuar login. Verifique as credenciais.\n');
-            // }
+            // await this.makeLogin();
+            // await this.startMatch();
+            // await this.inicia();
             
         } catch(error) {
             console.log(error);

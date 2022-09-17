@@ -329,17 +329,21 @@ class Browser {
         {
             await this.driver.get('https://www.chess.com/play/online');
             
-            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')), 0);
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
-
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')), 0);
-            await this.driver.findElement(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]/div[2]/span')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]')), 0);
+            await this.driver.findElement(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]')).click();
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="guest-button"]')), 0);
             await this.driver.findElement(By.xpath('//*[@id="guest-button"]')).click();
 
+
+            await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/button')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/div/div[2]/div[2]/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')).click();
+
         }
-        catch(e) { } 
+        catch(e) { console.log(e) } 
     }
 
     async turnHintsOn(piece, board) {
@@ -414,7 +418,7 @@ class Browser {
 
     async inicia() {
         // await this.turnHintsOn(28, 12);
-        await this.personalizeBoard(28, 12);
+        // await this.personalizeBoard(28, 12);
 
         while(true) {
             await this.restart();

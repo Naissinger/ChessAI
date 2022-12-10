@@ -64,7 +64,7 @@ class Update
             }
 
             request(options, (err, response, body) => {
-                resolve(/geckodriver-v([\w\W]*?)-/gm.exec(body)[1]);
+                // resolve(/geckodriver-v([\w\W]*?)-/gm.exec(body)[1]);
             })
         })
 

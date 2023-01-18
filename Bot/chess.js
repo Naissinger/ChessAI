@@ -379,9 +379,9 @@ class Browser {
 
     async personalizeBoard(piece, board) {
         await this.driver.findElement(By.xpath('//*[@id="board-controls-settings"]')).click();
-        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select')), 0);
+        await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[8]/section/div[2]/div/div[2]/select')), 0);
 
-        let element = this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[2]/select'));
+        let element = this.driver.findElement(By.xpath('/html/body/div[8]/section/div[2]/div/div[2]/select'));
 
         await this.driver.executeScript((element) => {
             element.scrollIntoView({block: 'center'});
@@ -389,17 +389,17 @@ class Browser {
 
         element.click();
 
-        await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[2]/select/option[${piece}]`)).click();
+        await this.driver.findElement(By.xpath(`/html/body/div[8]/section/div[2]/div/div[2]/select/option[${piece}]`)).click();
 
-        element = this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[2]/div/div[3]/select'));
+        element = this.driver.findElement(By.xpath('/html/body/div[8]/section/div[2]/div/div[3]/select'));
 
         await this.driver.executeScript((element) => {
             element.scrollIntoView({block: 'center'});
         }, element);
 
-        await this.driver.findElement(By.xpath(`/html/body/div[8]/div[2]/div[2]/div/div[3]/select/option[${board}]`)).click();
+        await this.driver.findElement(By.xpath(`/html/body/div[8]/section/div[2]/div/div[3]/select/option[${board}]`)).click();
 
-        await this.driver.findElement(By.xpath('/html/body/div[8]/div[2]/div[3]/button[2]')).click();
+        await this.driver.findElement(By.xpath('/html/body/div[8]/section/div[3]/button[2]')).click();
     }
 
     async screenShot() {
@@ -420,7 +420,7 @@ class Browser {
 
     async inicia() {
         // await this.turnHintsOn(28, 12);
-        await this.personalizeBoard(28, 12);
+        await this.personalizeBoard(7, 12);
 
         while(true) {
             await this.restart();

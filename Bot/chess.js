@@ -707,7 +707,7 @@ class Browser {
                     }
                 } catch(NoSuchElementError) {
                     try {
-                        if(await this.driver.findElement(By.className('clock-component clock-bottom clock-black clock-player-turn'))) {
+                        if(await this.driver.findElement(By.className('clock-component clock-top clock-black clock-player-turn'))) {
                         
                             this.turn = true;
                             return true;
@@ -724,14 +724,14 @@ class Browser {
                 await this.restart();
                 
                 try {
-                    if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                    if(await this.driver.findElement(By.className('clock-component clock-bottom clock-black clock-player-turn'))) {
                         
                         this.turn = true;
                         return true;
                     }
                 } catch(NoSuchElementError) {
                     try {
-                        if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                        if(await this.driver.findElement(By.className('clock-component clock-top clock-white clock-player-turn'))) {
                         
                             this.turn = true;
                             return true;

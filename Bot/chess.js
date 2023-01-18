@@ -331,8 +331,10 @@ class Browser {
             
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')), 0);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')).click();
-            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]')), 0);
-            await this.driver.findElement(By.xpath('/html/body/div[31]/div/div/div[1]/div/label[4]')).click();
+            
+            await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[32]/div/div/div[1]/div/label[4]/div[2]/span')), 0);
+            await this.driver.findElement(By.xpath('/html/body/div[32]/div/div/div[1]/div/label[4]/div[2]/span')).click();
+            
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="guest-button"]')), 0);
             await this.driver.findElement(By.xpath('//*[@id="guest-button"]')).click();
 
@@ -418,7 +420,7 @@ class Browser {
 
     async inicia() {
         // await this.turnHintsOn(28, 12);
-        // await this.personalizeBoard(28, 12);
+        await this.personalizeBoard(28, 12);
 
         while(true) {
             await this.restart();
@@ -624,7 +626,7 @@ class Browser {
                         this.jogada = 0;
                     }
                 } catch(e) {
-                    
+                    // console.log(e);
                 }
             }
         }
@@ -694,14 +696,14 @@ class Browser {
                 await this.restart();
 
                 try{
-                    if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                    if(await this.driver.findElement(By.className('clock-component clock-bottom clock-white clock-player-turn'))) {
                         
                         this.turn = true;
                         return true;
                     }
                 } catch(NoSuchElementError) {
                     try {
-                        if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn'))) {
+                        if(await this.driver.findElement(By.className('clock-component clock-bottom clock-black clock-player-turn'))) {
                         
                             this.turn = true;
                             return true;
@@ -987,19 +989,19 @@ class Browser {
             await this.restart();
 
             try {
-                if(await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live clock-running player-clock clock-player-turn')) || await this.driver.findElement(By.className('clock-component clock-black clock-bottom clock-live player-clock'))) {
+                if(await this.driver.findElement(By.className('clock-component clock-bottom clock-black clock-player-turn')) || await this.driver.findElement(By.className('clock-component clock-bottom clock-black'))) {
                     this.player = 'Black';
                     this.oponent = 'White';
                     break;
                 }
-            } catch(NoSuchElementError) {
+            } catch(error) {
                 try {
-                    if(await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live clock-running player-clock clock-player-turn')) || await this.driver.findElement(By.className('clock-component clock-white clock-bottom clock-live player-clock'))) {
+                    if(await this.driver.findElement(By.className('clock-component clock-bottom clock-white clock-player-turn')) || await this.driver.findElement(By.className('clock-component clock-bottom clock-white'))) {
                         this.player = 'White';
                         this.oponent = 'Black';
                         break;
                     }
-                } catch(NoSuchElementError) {
+                } catch(error) {
                     continue;
                 }
             }

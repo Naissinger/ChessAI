@@ -316,11 +316,11 @@ class Browser {
 
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')), 0);
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/button')).click();
-            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/div/div/div[2]/div/button[1]')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/div/div[2]/div[2]/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div[1]/div/button')).click();
 
         }
-        catch(e) { console.log(e) } 
+        catch(e) { } 
     }
 
     async noLogin() {
@@ -330,6 +330,8 @@ class Browser {
             await this.driver.get('https://www.chess.com/play/online');
             
             await this.driver.wait(until.elementLocated(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')), 0);
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/button')).click();
+            await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/div[1]/div/div[2]/div[2]/button[1]')).click();
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')).click();
             
             await this.driver.wait(until.elementLocated(By.xpath('/html/body/div[32]/div/div/div[1]/div/label[4]/div[2]/span')), 0);
@@ -345,7 +347,7 @@ class Browser {
             await this.driver.findElement(By.xpath('//*[@id="board-layout-sidebar"]/div/div[2]/div/div[1]/div/button')).click();
 
         }
-        catch(e) { console.log(e) } 
+        catch(e) { } 
     }
 
     async turnHintsOn(piece, board) {
@@ -373,7 +375,7 @@ class Browser {
         }
         catch(e)
         {
-            console.log(e);
+            
         }
     }
 

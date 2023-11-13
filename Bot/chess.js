@@ -209,7 +209,7 @@ class Browser {
 
         await this.restart();
 
-        const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
+        const id = await this.driver.findElement(By.tagName('wc-chess-board')).getAttribute('id');
 
         let boardArray = [];
 
@@ -414,7 +414,7 @@ class Browser {
 
     async screenShot() {
 
-        let id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
+        let id = await this.driver.findElement(By.tagName('wc-chess-board')).getAttribute('id');
         let board = await this.driver.findElement(By.id(id));
 
         while (true) {
@@ -674,7 +674,7 @@ class Browser {
 /________\\  By: Cisco\n`)
 
         try {
-            await this.atualizaDrivers();
+            // await this.atualizaDrivers();
             await this.initialize();
 
             await this.noLogin();
@@ -770,7 +770,7 @@ class Browser {
 
         while (true) {
             try {
-                const id = await this.driver.findElement(By.tagName('chess-board')).getAttribute('id');
+                const id = await this.driver.findElement(By.tagName('wc-chess-board')).getAttribute('id');
 
 
                 for (let i = 0; i < array.length; i++) {
